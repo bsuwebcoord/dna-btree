@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Scanner;
 
 
@@ -35,6 +36,19 @@ public class GeneBankCreateBTree {
 	       
 	       try{
 	            Scanner scan = new Scanner(new File(gbkFileName));
+	            
+	            while(scan.hasNext()){
+	    	        
+		            String a = scan.next();
+		            
+		            if(a.equals("ORIGIN")){
+		            
+		                
+		            
+		            }
+		        
+		        }
+		        scan.close();
 	        }
 	        catch(Exception e){
 	            System.out.println();
@@ -44,18 +58,7 @@ public class GeneBankCreateBTree {
 	        }
 	        
 	        
-	        while(scan.hasNext()){
-	        
-	            String a = scan.next();
-	            
-	            if(a.equals("ORIGIN")){
-	            
-	                
-	            
-	            }
-	        
-	        }
-	        scan.close();   
+	           
 	       
 	       
 	    }
