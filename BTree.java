@@ -1,7 +1,9 @@
+import java.io.*;
 
 public class BTree {
 	
 	BTreeNode root = null;
+	int numTreeNodes = 0;
 	int t;
 	
 	//similar to B-Tree-Create code in book p. 492
@@ -101,6 +103,22 @@ public class BTree {
 			}
 			bTreeInsertNonfull(x.Ci, k);
 		}
+	}
+	
+	diskWrite(BTreeNode n){
+		
+	}
+	
+	diskRead(BTreeNode n){
+		DataInputStream dis = new DataInputStream(new FileInputStream("gbkfile.bin"));
+		for(int i = 0; i < numTreeNodes; i++){
+			//set the data according to the order which we're storing
+			//Example:
+			//long l1 = dis.readLong();
+			//double d1 = disreadDouble();
+			//long l2 = disreadLong();
+		}
+		dis.close();
 	}
 
 }
