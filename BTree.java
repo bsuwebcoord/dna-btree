@@ -109,8 +109,9 @@ public class BTree {
 		
 	}
 	
+	//using RandomAccessFile
 	diskRead(BTreeNode n){
-		DataInputStream dis = new DataInputStream(new FileInputStream("gbkfile.bin"));
+		RandomAccessFile dis = new RandomAccessFile("gbkfile.bin", "r"));
 		for(int i = 0; i < numTreeNodes; i++){
 			//set the data according to the order which we're storing
 			//Example:
