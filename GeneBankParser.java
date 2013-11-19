@@ -54,10 +54,24 @@ public static void main(String[] args) throws FileNotFoundException {
 		for(String d : dna){
 			dna_string += d;
 		}
-		System.out.println(dna_string);
+		//System.out.println(dna_string);
 		
+		int seqLength = 30;
 		
-		
+		for (int ch = 0; ch < dna_string.length(); ch++) 
+        {
+			if(seqLength <= dna_string.length()){
+				String sequence = dna_string.substring(ch,seqLength);
+				if(sequence.contains("n")){
+					sequence = null;
+					System.out.println("N appeared in the sequence");
+				}else{
+					System.out.println(sequence);
+				}
+				seqLength++;
+			}
+			
+        }
 		
 		
 
