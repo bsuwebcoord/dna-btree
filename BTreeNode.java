@@ -1,7 +1,7 @@
 
 public class BTreeNode {
-	
-	TreeObject[] treeO;
+
+    TreeObject[] treeO;
     int numTreeObjects;
     int[] childPointers;
     int parentPointer;

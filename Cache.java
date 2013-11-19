@@ -1,8 +1,8 @@
-import java.util.*;
 
+import java.util.*;
 public class Cache<E> {
-	
-	public int cacheSize;
+    
+    public int cacheSize;
     public int hits;
     public int references;
     List<E> list = new LinkedList<E>();
