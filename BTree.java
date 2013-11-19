@@ -27,7 +27,7 @@ public class BTree {
 		else{
 			//I'm not sure what Ci is in the book
 			//needs to be a BTreeNode though
-			diskRead(x, Ci);
+			diskRead(x.Ci);
 			return bTreeSearch(x.Ci, k);
 		}
 	}
