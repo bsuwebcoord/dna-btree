@@ -1,9 +1,6 @@
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -56,12 +53,11 @@ public class Parser {
 					
 					if(line.matches("^ORIGIN")){
 						in_origin = true;
-						String origin = line;
 						line = file.nextLine();//to not include ORIGIN
-						line = line.replaceAll("\\s", "").replaceAll("[0-9]","");
+						line = line.replaceAll("\\s", "").replaceAll("[0-9]","");//line immediately after ORIGIN
 					}
 					
-					//Add to ArrayList
+					//concatenate
 					if(in_origin)
 					{
 						dna += line;
