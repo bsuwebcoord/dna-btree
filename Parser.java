@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -18,7 +19,7 @@ public class Parser {
         seqLength = i;
         fileName = a;
         
-        dnaSequence(a);
+        dnaSequence();
         
         
     }
@@ -29,11 +30,11 @@ public class Parser {
      * @param filename
      * @return
      */
-    public ArrayList<String> dnaSequence(String filename){
+    public ArrayList<String> dnaSequence(){
     	
     	Scanner file;
 		try {
-			file = new Scanner(new BufferedReader(new FileReader(filename)));
+			file = new Scanner(new BufferedReader(new FileReader(fileName)));
 		
 			String line;
 			boolean in_origin = false;
@@ -44,13 +45,12 @@ public class Parser {
 				
 				
 					line = file.nextLine();
-					
+					//Remove all spaces and numbers
 					line = line.replaceAll("\\s", "").replaceAll("[0-9]","");
 					
 					
 					if(line.matches("^//")){
 						in_origin = false;
-						
 					}
 					
 					
@@ -61,43 +61,69 @@ public class Parser {
 						line = line.replaceAll("\\s", "").replaceAll("[0-9]","");
 					}
 					
-					
-					
+					//Add to ArrayList
 					if(in_origin)
 					{
 						dna.add(line);
-					
 						//System.out.println(line);
 					}
-					
-					
-					String dna_string = "";
-					
-					for(String d : dna){
-						dna_string += d;
-					}
-					//System.out.println(dna_string);
-					
-					
-					
-					for (int ch = 0; ch < dna_string.length(); ch++) 
-			        {
-						if(seqLength <= dna_string.length()){
-							String sequence = dna_string.substring(ch,seqLength);
-							if(sequence.contains("n")){
-								sequence = null;
-								System.out.println("N appeared in the sequence");
-							}else{
-								//TreeObject t = new TreeObject(1, this.seq2Long(sequence));
-								System.out.println(this.seq2Long(sequence));
-							}
-							seqLength++;
-						}
-						
-			        }
-					
+										
 			}
 			file.close();
+			
+			//Concatenate into one large string
+			String dna_string = "";
+			for(String d : dna){
+				dna_string += d;
+			}
+			//System.out.println(dna_string);
+			
+			int chEndPointer = seqLength;
+			
+			for (int ch = 0; ch < dna_string.length(); ch++) 
+	        {
+				if(chEndPointer <= dna_string.length()){
+					String sequence = dna_string.substring(ch,chEndPointer);
+					if(sequence.contains("n")){
+						sequence = null;
+						System.out.println("N appeared in the sequence");
+					}else{
+												
+						
+						TreeObject t = new TreeObject(1, this.seq2Long(sequence));
+						
+						/*TESTING TO VIEW BINARY REPRESENTATION
+						 *****************************
+						System.out.println(sequence);
+						long dnaLong = this.seq2Long(sequence);
+						System.out.println("Long value: "+dnaLong);
+						String binString = Long.toBinaryString(dnaLong);
+						System.out.println("toBinaryString: "+binString);
+						
+						int length = (seqLength*2) - binString.length();
+						System.out.println("Short by: "+length);
+						
+						//USE THIS SNIPPET FOR READING LONG BACK TO BINARY (PADS MISSING "0"s IN FRONT)
+						String newBinString = "";//reset
+						if(length > 0){
+							char[] padArray = new char[length];
+							Arrays.fill(padArray, '0');
+							String padString = new String(padArray);
+							newBinString = padString + binString;
+						}
+						
+						System.out.println("toBinaryString: "+newBinString);
+						System.out.println("string:         "+seq2BinStr(sequence));
+						System.out.println("");
+						*/
+						
+						
+					}
+					chEndPointer++;
+				}
+				
+	        }
+			
 			return dna;
 			
 		} catch (FileNotFoundException e) {
@@ -109,15 +135,34 @@ public class Parser {
 		return null;
     }
     
-    public String seq2Long(String  subsequence){
+    public String seq2BinStr(String  subsequence){
     	
-    	String dnaBinStr = null;
-    	for (int ch = 0; ch < subsequence.length(); ch++) 
-        {
-    		dnaBinStr += this.dnaBase(subsequence.charAt(ch));
-        }
+	    	String dnaBinStr = "";
+	    	for (int ch = 0; ch < subsequence.length(); ch++) 
+	        {
+	    		dnaBinStr += this.dnaBase(subsequence.charAt(ch));
+	        }
+	    	
+	    	return dnaBinStr;
+	    	
+	    
     	
-    	return dnaBinStr;
+    }
+    
+    public Long seq2Long(String  subsequence){
+    	try{
+	    	String dnaBinStr = "";
+	    	for (int ch = 0; ch < subsequence.length(); ch++) 
+	        {
+	    		dnaBinStr += this.dnaBase(subsequence.charAt(ch));
+	        }
+	    	
+	    	return Long.parseLong(dnaBinStr,2);
+	    	
+	    } catch (NumberFormatException nfe) {
+	        System.out.println("NumberFormatException: " + nfe.getMessage());
+	    }
+    	return (long) 1;
     	
     }
     

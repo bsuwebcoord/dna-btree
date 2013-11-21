@@ -34,7 +34,8 @@ public class GeneBankCreateBTree {
            
        }
        
-       gbkFileName = args[0];
+       gbkFileName = args[2];
+       seqLength = Integer.parseInt(args[3]);
        
        Parser parse = new Parser (seqLength, gbkFileName);
        
