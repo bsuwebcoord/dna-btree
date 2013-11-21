@@ -19,7 +19,7 @@ public class Parser {
         seqLength = i;
         fileName = a;
         
-        dnaSequence();
+        dna2Long(dnaSequence());
         
         
     }
@@ -30,20 +30,20 @@ public class Parser {
      * @param filename
      * @return
      */
-    public ArrayList<String> dnaSequence(){
+    public String dnaSequence(){
     	
     	Scanner file;
-		try {
-			file = new Scanner(new BufferedReader(new FileReader(fileName)));
+    	String dna = "";
+    	String line = "";
+		boolean in_origin = false;
 		
-			String line;
-			boolean in_origin = false;
-			ArrayList<String> dna = new ArrayList<String>();
+		
+		try {
+			
+			file = new Scanner(new BufferedReader(new FileReader(fileName)));
 			
 			while(file.hasNextLine()){
-				
-				
-				
+			
 					line = file.nextLine();
 					//Remove all spaces and numbers
 					line = line.replaceAll("\\s", "").replaceAll("[0-9]","");
@@ -64,66 +64,14 @@ public class Parser {
 					//Add to ArrayList
 					if(in_origin)
 					{
-						dna.add(line);
+						dna += line;
 						//System.out.println(line);
 					}
 										
 			}
 			file.close();
 			
-			//Concatenate into one large string
-			String dna_string = "";
-			for(String d : dna){
-				dna_string += d;
-			}
-			//System.out.println(dna_string);
-			
-			int chEndPointer = seqLength;
-			
-			for (int ch = 0; ch < dna_string.length(); ch++) 
-	        {
-				if(chEndPointer <= dna_string.length()){
-					String sequence = dna_string.substring(ch,chEndPointer);
-					if(sequence.contains("n")){
-						sequence = null;
-						System.out.println("N appeared in the sequence");
-					}else{
-												
-						
-						TreeObject t = new TreeObject(1, this.seq2Long(sequence));
-						
-						/*TESTING TO VIEW BINARY REPRESENTATION
-						 *****************************
-						System.out.println(sequence);
-						long dnaLong = this.seq2Long(sequence);
-						System.out.println("Long value: "+dnaLong);
-						String binString = Long.toBinaryString(dnaLong);
-						System.out.println("toBinaryString: "+binString);
-						
-						int length = (seqLength*2) - binString.length();
-						System.out.println("Short by: "+length);
-						
-						//USE THIS SNIPPET FOR READING LONG BACK TO BINARY (PADS MISSING "0"s IN FRONT)
-						String newBinString = "";//reset
-						if(length > 0){
-							char[] padArray = new char[length];
-							Arrays.fill(padArray, '0');
-							String padString = new String(padArray);
-							newBinString = padString + binString;
-						}
-						
-						System.out.println("toBinaryString: "+newBinString);
-						System.out.println("string:         "+seq2BinStr(sequence));
-						System.out.println("");
-						*/
-						
-						
-					}
-					chEndPointer++;
-				}
-				
-	        }
-			
+			//System.out.println(dna);
 			return dna;
 			
 		} catch (FileNotFoundException e) {
@@ -132,10 +80,82 @@ public class Parser {
             System.out.println();
             System.exit(1);
 		}
-		return null;
+		return dna;
+		
     }
     
-    public String seq2BinStr(String  subsequence){
+    
+        
+    /** takes fully parsed and concatenated dna string
+     * 
+     * @param dna_string 
+     */
+    public void dna2Long(String dna_string){
+    	
+    	
+		int chEndPointer = seqLength;
+		
+		for (int ch = 0; ch < dna_string.length(); ch++) 
+        {
+			if(chEndPointer <= dna_string.length()){
+				
+				String sequence = dna_string.substring(ch,chEndPointer);
+				
+				//detect if "n" is in the sequence
+				if(sequence.contains("n") || sequence.contains("N")){
+					sequence = null;
+					System.out.println("N appeared in the sequence");
+				}else{
+					
+					long dnaLong = Long.parseLong(this.seq2Bin(sequence),2);
+					TreeObject t = new TreeObject(1, dnaLong); 
+					System.out.println(t);
+					
+					
+					/*TESTING TO VIEW BINARY REPRESENTATION
+					 *****************************
+					System.out.println(sequence);
+					long dnaBin = this.seq2Bin(sequence);
+					
+					System.out.println("Long value: "+dnaLong);
+					
+					//convert from long back to string
+					String binString = Long.toBinaryString(dnaLong);
+					System.out.println("toBinaryString: "+binString);
+					
+					//determin if length of string is less than sequence length (*2)
+					int length = (seqLength*2) - binString.length();
+					System.out.println("Short by: "+length);
+					
+					//USE THIS SNIPPET FOR READING LONG BACK TO BINARY (PADS MISSING "0"s IN FRONT)
+					String newBinString = "";//reset
+					if(length > 0){
+						char[] padArray = new char[length];
+						Arrays.fill(padArray, '0');
+						String padString = new String(padArray);
+						newBinString = padString + binString; //pad with "0"s if needed
+					}
+					
+					System.out.println("toBinaryString: "+newBinString);
+					System.out.println("string:         "+seq2BinStr(sequence));
+					System.out.println("");
+					*/
+					
+					
+				}
+				chEndPointer++;
+			}
+			
+        }
+    }
+    
+   
+    /** Convert dna sequence to binary representation
+     * 
+     * @param subsequence
+     * @return
+     */
+    public String seq2Bin(String  subsequence){
     	
 	    	String dnaBinStr = "";
 	    	for (int ch = 0; ch < subsequence.length(); ch++) 
@@ -144,28 +164,11 @@ public class Parser {
 	        }
 	    	
 	    	return dnaBinStr;
-	    	
 	    
-    	
     }
     
-    public Long seq2Long(String  subsequence){
-    	try{
-	    	String dnaBinStr = "";
-	    	for (int ch = 0; ch < subsequence.length(); ch++) 
-	        {
-	    		dnaBinStr += this.dnaBase(subsequence.charAt(ch));
-	        }
-	    	
-	    	return Long.parseLong(dnaBinStr,2);
-	    	
-	    } catch (NumberFormatException nfe) {
-	        System.out.println("NumberFormatException: " + nfe.getMessage());
-	    }
-    	return (long) 1;
-    	
-    }
-    
+        
+            
     public String dnaBase(char ch){
     	
     	switch(ch){
@@ -187,5 +190,7 @@ public class Parser {
     	}
     	return "";
     }
+    
+     
 
 }

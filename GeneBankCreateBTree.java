@@ -39,7 +39,7 @@ public class GeneBankCreateBTree {
        
        Parser parse = new Parser (seqLength, gbkFileName);
        
-          
+         
        
        
     }

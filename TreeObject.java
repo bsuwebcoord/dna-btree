@@ -20,5 +20,13 @@ public class TreeObject {
 	public void addFrequency(){
 		frequency++;
 	} 
+	
+	
+	public String toString(){
+		
+		String string = key+" : "+frequency;
+		
+		return string;
+	}
 
 }
