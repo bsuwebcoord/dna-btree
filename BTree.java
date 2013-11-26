@@ -5,11 +5,28 @@ public class BTree {
 	BTreeNode root = null;
 	int numTreeNodes = 0;
 	int t;
+	RandomAccessFile dis;
+	
 	
 	//similar to B-Tree-Create code in book p. 492
 	public BTree(){
 		root = new BTreeNode(5);
 		root.numTreeObjects = 0;
+		
+		try{
+			
+			dis = new RandomAccessFile("gbkfile.bin", "r");
+			
+		}
+		catch(FileNotFoundException e){
+			
+			System.out.println();
+	        System.out.println("RuntimeException: " + e.getMessage());
+	        System.out.println();
+	        System.exit(1);
+			
+		}
+		
 	}
 	
 	//similar to B-Tree-Search code in book p. 492
@@ -27,16 +44,14 @@ public class BTree {
 			return null;
 		}
 		else{
-			//I'm not sure what Ci is in the book
-			//needs to be a BTreeNode though
-			diskRead(x.Ci);
-			return bTreeSearch(x.Ci, k);
+			diskRead(x.childPointers[i]);
+			return bTreeSearch(x.childPointers[i], k);
 		}
 	}
 	
-	bTreeSplitChild(BTreeNode x, int i){
+	public void bTreeSplitChild(BTreeNode x, int i){
 		BTreeNode z = new BTreeNode(5);
-		y = x.Ci;
+		BTreeNode y = diskRead(x.childPointers[i]);
 		z.leaf = y.leaf;
 		z.numTreeObjects = t - 1;
 		for(int j = 1; j <= t-1; j++){
@@ -44,14 +59,14 @@ public class BTree {
 		}
 		if(!y.leaf){
 			for(int j = 1; j <= t; j++){
-				z.Cj = y.C(j+t)
+				z.childPointers[j] = y.childPointers[j+t];
 			}
 		}
 		y.numTreeObjects = t - 1;
 		for(int j = x.numTreeObjects + 1; j >= i+1; j--){
-			x.C(j+1) = x.Cj
+			x.childPointers[j+1] = x.childPointers[j];
 		}
-		x.C(i+1) = z;
+		x.childPointers[i+1] = z.globalOffset;
 		for(int j = x.numTreeObjects; j >= i; j--){
 			x.treeO[j+1].key = x.treeO[j].key;
 		}
@@ -62,14 +77,14 @@ public class BTree {
 		diskWrite(x);
 	}
 	
-	bTreeInsert(long k){
+	public void bTreeInsert(long k){
 		BTreeNode r = root;
-		if(root.numTreeObjects == 2t-1){
+		if(root.numTreeObjects == 2*t-1){
 			BTreeNode s = new BTreeNode(5);
 			root = s;
 			s.leaf = false;
 			s.numTreeObjects = 0;
-			s.C1 = r;
+			s.childPointers[1] = r.globalOffset;
 			bTreeSplitChild(s, 1);
 			bTreeInsertNonfull(s,k);
 		}
@@ -78,7 +93,7 @@ public class BTree {
 		}
 	}
 	
-	bTreeInsertNonfull(BTreeNode x, long k){
+	public void bTreeInsertNonfull(BTreeNode x, long k){
 		int i = x.numTreeObjects;
 		if(x.leaf){
 			while(i >= 1 && k < x.treeO[i].key){
@@ -94,24 +109,26 @@ public class BTree {
 				i--;
 			}
 			i++;
-			diskRead(x.Ci)
-			if(x.Ci.numTreeObjects == 2t-1){
+			BTreeNode child = diskRead(x.childPointers[i]);
+			if(child.numTreeObjects == 2*t-1){
 				bTreeSplitChild(x, i);
 				if(k > x.treeO[i].key){
 					i++;
 				}
 			}
-			bTreeInsertNonfull(x.Ci, k);
+			bTreeInsertNonfull(child , k);
 		}
 	}
 	
-	diskWrite(BTreeNode n){
+	public void diskWrite(BTreeNode n){
+		
+		
 		
 	}
 	
 	//using RandomAccessFile
-	diskRead(BTreeNode n){
-		RandomAccessFile dis = new RandomAccessFile("gbkfile.bin", "r"));
+	public BTreeNode diskRead(int offset){
+		
 		for(int i = 0; i < numTreeNodes; i++){
 			//set the data according to the order which we're storing
 			//Example:
@@ -119,7 +136,7 @@ public class BTree {
 			//double d1 = disreadDouble();
 			//long l2 = disreadLong();
 		}
-		dis.close();
+		
 	}
 
 }
