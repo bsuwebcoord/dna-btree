@@ -120,22 +120,91 @@ public class BTree {
 		}
 	}
 	
-	public void diskWrite(BTreeNode n){
+	public void diskWrite(int offset, BTreeNode node) throws IOException{
 		
+		// Each BTreeNode will be stored in the binary file with the following sequence:
+		// "8 bytes globalOffset value"
+		// "1 byte leaf true/false" 
+		// "4 bytes number of tree objects" (this can reach the maximum int value of 2,147,483,647)
+		// "4 bytes parent pointer" (this can reach the maximum int value of 2,147,483,647)
+		// "2t * 4 bytes child pointers"
+		// "2t-1 * 12 bytes tree object" (31 bits for the frequency, 64 bits for the key value)
+				
+		// The optimal degree can be calculated with the following equation:
+		// (2t-1)(12) + (2t+1)(4) + 13 <= 4096
+		// t <= 127
 		
+		//write to specified offset or end of file, end of file can be reached with a negative offset argument
+		if(offset < 0){
+			dis.seek(dis.length());
+		}
+		else{
+			dis.seek(offset);
+		}
+		
+		//write the current position of the binary file, write first to get the correct starting position for the node
+		dis.writeLong(dis.getFilePointer());
+		dis.writeBoolean(node.leaf);
+		dis.writeInt(node.numTreeObjects);
+		dis.writeInt(node.parentPointer);
+		
+		for(int i = 0; i <= node.childPointers.length; i++){
+			
+			dis.writeInt(node.childPointers[i]);
+			
+		}
+		
+		for(int i = 0; i <= node.treeO.length; i++){
+	    	
+			dis.writeInt(node.treeO[i].frequency);
+			dis.writeLong(node.treeO[i].key);
+			    	
+		}
 		
 	}
 	
 	//using RandomAccessFile
-	public BTreeNode diskRead(int offset){
+	public BTreeNode diskRead(int offset) throws IOException{
 		
-		for(int i = 0; i < numTreeNodes; i++){
-			//set the data according to the order which we're storing
-			//Example:
-			//long l1 = dis.readLong();
-			//double d1 = disreadDouble();
-			//long l2 = disreadLong();
-		}
+		// Each BTreeNode will be stored in the binary file with the following sequence:
+		// "8 bytes globalOffset value"
+		// "1 byte leaf true/false" 
+		// "4 bytes number of tree objects" (this can reach the maximum int value of 2,147,483,647)
+		// "4 bytes parent pointer" (this can reach the maximum int value of 2,147,483,647)
+		// "2t * 4 bytes child pointers"
+		// "2t-1 * 12 bytes tree object" (31 bits for the frequency, 64 bits for the key value)
+						
+		// The optimal degree can be calculated with the following equation:
+		// (2t-1)(12) + (2t+1)(4) + 13 <= 4096
+		// t <= 127
+		
+		int globalOffset;
+		boolean leaf;
+		int numTreeObjects;
+		int parentPointer;
+		int[] childPointers = new int[2*t];
+	    TreeObject[] treeO = new TreeObject[(2*t)-1];
+	    
+	    dis.seek(offset);
+	    
+	    globalOffset = dis.readInt();
+	    leaf = dis.readBoolean();
+	    numTreeObjects = dis.readInt();
+	    parentPointer = dis.readInt();
+	    
+	    for(int i = 0; i <= childPointers.length; i++){
+	    	
+	    	childPointers[i] = dis.readInt();
+	    	
+	    }
+	    
+	    for(int i = 0; i <= treeO.length; i++){
+	    	
+	    	treeO[i] = new TreeObject(dis.readInt(), dis.readLong());
+	    	
+	    }
+	    
+	    return new BTreeNode(globalOffset, leaf, numTreeObjects, parentPointer, childPointers, treeO);
 		
 	}
 
