@@ -1,8 +1,7 @@
-
 public class TreeObject {
-	
-	long key;
+
 	int frequency;
+	long key;
 	
 	public TreeObject(int frequency, long key){
 		this.frequency = frequency;
