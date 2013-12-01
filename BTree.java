@@ -40,7 +40,7 @@ public class BTree {
                         
                 }
                 
-                //placeholders for BTree metadata (number of tree nodes and degree)
+                //placeholders for BTree metadata at beginning of file (number of tree nodes and degree)
                 dis.writeInt(numTreeNodes);
                 dis.writeInt(t);
                 dis.writeLong(byteOffsetRoot);
