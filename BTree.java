@@ -7,28 +7,31 @@ public class BTree {
         int t;
         long byteOffsetRoot = 0;
         RandomAccessFile dis;
-        int[] childrenInitializer = new int[2*t];
-		TreeObject[] treeObjectInitializer = new TreeObject[(2*t)-1];
+        int[] childrenInitializer = null;
+		TreeObject[] treeObjectInitializer = null;
         
         
         //similar to B-Tree-Create code in book p. 492
         public BTree(int degree) throws IOException{
         	
         		t = degree;
+        		
+        		childrenInitializer = new int[2*t];
+        		treeObjectInitializer = new TreeObject[(2*t)-1];
         	
         		//initialize the child array and tree object array to a constant size in order to read correctly
-        		for(int i = 0; i <= treeObjectInitializer.length; i++){
+        		for(int i = 0; i < treeObjectInitializer.length; i++){
         			childrenInitializer[i] = 0;
         			treeObjectInitializer[i] = new TreeObject(0,0);
         		}
         		//initialize the last item in the child array that wasn't covered by the for loop above
-        		childrenInitializer[childrenInitializer.length] = 0;
+        		childrenInitializer[childrenInitializer.length-1] = 0;
         	
                 root = new BTreeNode(0, true, 0, 0, childrenInitializer, treeObjectInitializer);
                 
                 try{
-                        
-                        dis = new RandomAccessFile("gbkfile.bin", "r");
+                       
+                        dis = new RandomAccessFile("gbkfile.bin", "rw");
                         
                 }
                 catch(FileNotFoundException e){
