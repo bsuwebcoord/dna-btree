@@ -170,7 +170,11 @@ public class GeneBankCreateBTree {
        
        Parser parse = new Parser (seqLength, gbkFileName);
        
-         
+       while(parse.nextBinSequence() != -1){
+    	   System.out.println(parse.nextBinSequence());
+       }
+       
+       System.out.println(parse.entireDNASequence);
        
        
     }
