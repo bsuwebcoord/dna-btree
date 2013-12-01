@@ -5,13 +5,16 @@ public class BTree {
         BTreeNode root = null;
         int numTreeNodes = 0;
         int t;
+        long byteOffsetRoot = 0;
         RandomAccessFile dis;
         int[] childrenInitializer = new int[2*t];
 		TreeObject[] treeObjectInitializer = new TreeObject[(2*t)-1];
         
         
         //similar to B-Tree-Create code in book p. 492
-        public BTree(){
+        public BTree(int degree) throws IOException{
+        	
+        		t = degree;
         	
         		//initialize the child array and tree object array to a constant size in order to read correctly
         		for(int i = 0; i <= treeObjectInitializer.length; i++){
@@ -36,6 +39,11 @@ public class BTree {
                 		System.exit(1);
                         
                 }
+                
+                //placeholders for BTree metadata (number of tree nodes and degree)
+                dis.writeInt(numTreeNodes);
+                dis.writeInt(t);
+                dis.writeLong(byteOffsetRoot);
                 
         }
         
