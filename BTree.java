@@ -15,38 +15,6 @@ public class BTree {
         public BTree(int degree) throws IOException{
         	
         		t = degree;
-        		
-        		childrenInitializer = new int[2*t];
-        		treeObjectInitializer = new TreeObject[(2*t)-1];
-        	
-        		//initialize the child array and tree object array to a constant size in order to read correctly
-        		for(int i = 0; i < treeObjectInitializer.length; i++){
-        			childrenInitializer[i] = 0;
-        			treeObjectInitializer[i] = new TreeObject(0,0);
-        		}
-        		//initialize the last item in the child array that wasn't covered by the for loop above
-        		childrenInitializer[childrenInitializer.length-1] = 0;
-        	
-                root = new BTreeNode(0, true, 0, 0, childrenInitializer, treeObjectInitializer);
-                
-                try{
-                       
-                        dis = new RandomAccessFile("gbkfile.bin", "rw");
-                        
-                }
-                catch(FileNotFoundException e){
-                        
-                		System.out.println();
-                		System.out.println("RuntimeException: " + e.getMessage());
-                		System.out.println();
-                		System.exit(1);
-                        
-                }
-                
-                //placeholders for BTree metadata at beginning of file (number of tree nodes and degree)
-                dis.writeInt(numTreeNodes);
-                dis.writeInt(t);
-                dis.writeLong(byteOffsetRoot);
                 
         }
         
@@ -169,6 +137,7 @@ public class BTree {
                 // t <= 127
                 
                 //write to specified offset or end of file, end of file can be reached with a negative offset argument
+        		//? not sure if it should be dis.length()-1 , I would think it would just be dis.length(), but if I do dis.length() I get errors
                 if(offset < 0){
                         dis.seek(dis.length()-1);
                 }
