@@ -168,6 +168,38 @@ public class GeneBankCreateBTree {
        
        tree = new BTree(degree);
        
+       tree.childrenInitializer = new int[2*tree.t];
+       tree.treeObjectInitializer = new TreeObject[(2*tree.t)-1];
+	
+		//initialize the child array and tree object array to a constant size in order to read correctly
+		for(int i = 0; i < tree.treeObjectInitializer.length; i++){
+			tree.childrenInitializer[i] = 0;
+			tree.treeObjectInitializer[i] = new TreeObject(0,0);
+		}
+		//initialize the last item in the child array that wasn't covered by the for loop above
+		tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
+	
+		tree.root = new BTreeNode(0, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
+       
+       try{
+              
+    	   tree.dis = new RandomAccessFile("gbkfile.bin", "rw");
+               
+       }
+       catch(FileNotFoundException e){
+               
+       		System.out.println();
+       		System.out.println("RuntimeException: " + e.getMessage());
+       		System.out.println();
+       		System.exit(1);
+               
+       }
+       
+       //placeholders for BTree metadata at beginning of file (number of tree nodes, degree, and the byte offset of the root)
+       tree.dis.writeInt(tree.numTreeNodes);
+       tree.dis.writeInt(tree.t);
+       tree.dis.writeLong(tree.byteOffsetRoot);
+       
        Parser parse = new Parser (seqLength, gbkFileName);
        
        long binarySequence = parse.nextBinSequence();
@@ -199,6 +231,8 @@ public class GeneBankCreateBTree {
     	   
     	   binarySequence = parse.nextBinSequence();
        }
+       
+       
        
     }
 
