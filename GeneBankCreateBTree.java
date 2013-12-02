@@ -170,12 +170,35 @@ public class GeneBankCreateBTree {
        
        Parser parse = new Parser (seqLength, gbkFileName);
        
-       while(parse.nextBinSequence() != -1){
-    	   System.out.println(parse.nextBinSequence());
+       long binarySequence = parse.nextBinSequence();
+       long foundKeyNodeGlobalPosition = 0;
+       
+       //insert or update all subsequences from the gbk file until the end of the file is reached
+       while(binarySequence != -1){
+    	   
+    	   foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
+    	   
+    	   //if the key wasn't found, insert it into the BTree
+    	   if(foundKeyNodeGlobalPosition == -1){
+    		   tree.bTreeInsert(binarySequence);
+    	   }
+    	   //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
+    	   else{
+    		   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+    		   
+    		   int i = 0;
+               
+               while(binarySequence != updatedNode.treeO[i].key){
+                       i++;
+               }
+               updatedNode.treeO[i].frequency++;
+               
+               tree.diskWrite(updatedNode.globalOffset, updatedNode);
+               
+    	   }
+    	   
+    	   binarySequence = parse.nextBinSequence();
        }
-       
-       System.out.println(parse.entireDNASequence);
-       
        
     }
 
