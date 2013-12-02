@@ -73,7 +73,7 @@ public class BTree {
         
         public void bTreeSplitChild(BTreeNode x, int i) throws IOException{
                 BTreeNode y = diskRead(x.childPointers[i]);
-                BTreeNode z = new BTreeNode((int)dis.length()-1, y.leaf, t-2, y.parentPointer, childrenInitializer, treeObjectInitializer);
+                BTreeNode z = new BTreeNode((int)dis.length()-1, y.leaf, t-1, y.parentPointer, childrenInitializer, treeObjectInitializer);
                 for(int j = 0; j <= t-2; j++){
                         z.treeO[j].key = y.treeO[j+t].key;
                 }
@@ -83,7 +83,7 @@ public class BTree {
                         }
                 }
                 y.numTreeObjects = t - 1;
-                for(int j = x.numTreeObjects + 1; j >= i+1; j--){
+                for(int j = x.numTreeObjects + 1; j >= i + 1; j--){
                         x.childPointers[j+1] = x.childPointers[j];
                 }
                 x.childPointers[i+1] = z.globalOffset;
@@ -103,6 +103,7 @@ public class BTree {
         
         public void bTreeInsert(long k) throws IOException{
                 BTreeNode r = root;
+                System.out.printf("\nThe number of tree objects of root is: %d\n", root.numTreeObjects);
                 if(root.numTreeObjects == 2*t-1){
                         BTreeNode s = new BTreeNode(-1, true, 0, 0, childrenInitializer, treeObjectInitializer);
                         root = s;
@@ -119,6 +120,7 @@ public class BTree {
         
         public void bTreeInsertNonfull(BTreeNode x, long k) throws IOException{
         		//added the subtraction of i by 1 to avoid indexOutOfBounds exception
+        		System.out.printf("\nThe number of tree objects of x is: %d\n", x.numTreeObjects);
                 int i = x.numTreeObjects - 1;
                 if(x.leaf){
                         while(i >= 0 && k < x.treeO[i].key){
@@ -138,9 +140,12 @@ public class BTree {
                         i++;
                         System.out.printf("\ni's value is: %d\n", i);
                         System.out.printf("\nThe child pointer is: %d\n", x.childPointers[i]);
+                        System.out.printf("\nThe size of the bin file is: %d\n", dis.length());
                         BTreeNode child = diskRead(x.childPointers[i]);
                         if(child.numTreeObjects == 2*t-1){
                                 bTreeSplitChild(x, i);
+                                //read in the updated split child
+                                child = diskRead(x.childPointers[i]);
                                 if(k > x.treeO[i].key){
                                         i++;
                                 }
@@ -209,7 +214,7 @@ public class BTree {
         	
         	System.out.printf("\nThe input offset value is: %d\n", offset);
                 
-                int globalOffset;
+                long globalOffset;
                 boolean leaf;
                 int numTreeObjects;
                 int parentPointer;
@@ -218,7 +223,7 @@ public class BTree {
             
             dis.seek(offset);
             
-            globalOffset = dis.readInt();
+            globalOffset = dis.readLong();
             leaf = dis.readBoolean();
             numTreeObjects = dis.readInt();
             parentPointer = dis.readInt();
@@ -235,7 +240,7 @@ public class BTree {
                     
             }
             
-            return new BTreeNode(globalOffset, leaf, numTreeObjects, parentPointer, childPointers, treeO);
+            return new BTreeNode((int)globalOffset, leaf, numTreeObjects, parentPointer, childPointers, treeO);
                 
         }
 
