@@ -8,13 +8,13 @@ public class BTree {
         long byteOffsetRoot = 0;
         RandomAccessFile dis;
         int[] childrenInitializer = null;
-		TreeObject[] treeObjectInitializer = null;
+                TreeObject[] treeObjectInitializer = null;
         
         
         //similar to B-Tree-Create code in book p. 492
         public BTree(int degree) throws IOException{
-        	
-        		t = degree;
+                
+                        t = degree;
                 
         }
         
@@ -51,11 +51,11 @@ public class BTree {
                         }
                 }
                 y.numTreeObjects = t - 1;
-                for(int j = x.numTreeObjects + 1; j >= i + 1; j--){
+                for(int j = x.numTreeObjects; j >= i+1; j--){
                         x.childPointers[j+1] = x.childPointers[j];
                 }
                 x.childPointers[i+1] = z.globalOffset;
-                for(int j = x.numTreeObjects; j >= i; j--){
+                for(int j = x.numTreeObjects-1; j >= i; j--){
                         x.treeO[j+1].key = x.treeO[j].key;
                 }
                 x.treeO[i].key = y.treeO[t].key;
@@ -87,8 +87,8 @@ public class BTree {
         }
         
         public void bTreeInsertNonfull(BTreeNode x, long k) throws IOException{
-        		//added the subtraction of i by 1 to avoid indexOutOfBounds exception
-        		System.out.printf("\nThe number of tree objects of x is: %d\n", x.numTreeObjects);
+                        //added the subtraction of i by 1 to avoid indexOutOfBounds exception
+                        System.out.printf("\nThe number of tree objects of x is: %d\n", x.numTreeObjects);
                 int i = x.numTreeObjects - 1;
                 if(x.leaf){
                         while(i >= 0 && k < x.treeO[i].key){
@@ -101,7 +101,7 @@ public class BTree {
                         diskWrite(x.globalOffset, x);
                 }
                 else{
-                		System.out.printf("\ni's value is: %d\n", i);
+                                System.out.printf("\ni's value is: %d\n", i);
                         while(i >= 0 && k < x.treeO[i].key){
                                 i--;
                         }
@@ -137,8 +137,9 @@ public class BTree {
                 // t <= 127
                 
                 //write to specified offset or end of file, end of file can be reached with a negative offset argument
-        		//? not sure if it should be dis.length()-1 , I would think it would just be dis.length(), but if I do dis.length() I get errors
+                        //? not sure if it should be dis.length()-1 , I would think it would just be dis.length(), but if I do dis.length() I get errors
                 if(offset < 0){
+                		System.out.printf("\n-----------------------------------------------------------The dis.length() is: %d\n", dis.length());
                         dis.seek(dis.length()-1);
                 }
                 else{
@@ -146,6 +147,8 @@ public class BTree {
                 }
                 
                 //write the current position of the binary file, write first to get the correct starting position for the node
+                System.out.printf("\n1The dis.getFilePointer() is: %d\n", dis.getFilePointer());
+                System.out.printf("\n2The dis.getFilePointer() is: %d\n", dis.getFilePointer());
                 dis.writeLong(dis.getFilePointer());
                 dis.writeBoolean(node.leaf);
                 dis.writeInt(node.numTreeObjects);
@@ -180,8 +183,8 @@ public class BTree {
                 // The optimal degree can be calculated with the following equation:
                 // (2t-1)(12) + (2t+1)(4) + 13 <= 4096
                 // t <= 127
-        	
-        	System.out.printf("\nThe input offset value is: %d\n", offset);
+                
+                System.out.printf("\nThe input offset value is: %d\n", offset);
                 
                 long globalOffset;
                 boolean leaf;
