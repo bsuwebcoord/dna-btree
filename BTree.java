@@ -13,8 +13,6 @@ public class BTree {
         FileWriter fw = null;
         BufferedWriter bw = null;
         
-        
-        //similar to B-Tree-Create code in book p. 492
         public BTree(int degree) throws IOException{
                 
                         t = degree;
@@ -80,7 +78,7 @@ public class BTree {
                 }
                 x.treeO[i].key = y.treeO[t].key;
                 x.numTreeObjects = x.numTreeObjects + 1;
-                System.out.printf("\nThe number of tree objects is: %d\n", x.numTreeObjects);
+                //System.out.printf("\nThe number of tree objects is: %d\n", x.numTreeObjects);
                 //write y in same position
                 diskWrite(y.globalOffset, y);
                 //write z at end of file
@@ -92,7 +90,7 @@ public class BTree {
         
         public void bTreeInsert(long k) throws IOException{
                 BTreeNode r = root;
-                System.out.printf("\nThe number of tree objects of root is: %d\n", root.numTreeObjects);
+                //System.out.printf("\nThe number of tree objects of root is: %d\n", root.numTreeObjects);
                 if(root.numTreeObjects == 2*t-1){
                         BTreeNode s = new BTreeNode(-1, true, 0, 0, childrenInitializer, treeObjectInitializer);
                         root = s;
@@ -109,7 +107,7 @@ public class BTree {
         
         public void bTreeInsertNonfull(BTreeNode x, long k) throws IOException{
                         //added the subtraction of i by 1 to avoid indexOutOfBounds exception
-                        System.out.printf("\nThe number of tree objects of x is: %d\n", x.numTreeObjects);
+                        //System.out.printf("\nThe number of tree objects of x is: %d\n", x.numTreeObjects);
                 int i = x.numTreeObjects - 1;
                 if(x.leaf){
                         while(i >= 0 && k < x.treeO[i].key){
@@ -118,18 +116,18 @@ public class BTree {
                         }
                         x.treeO[i+1].key = k;
                         x.numTreeObjects = x.numTreeObjects + 1;
-                        System.out.printf("\nThe number of tree objects in the bTreeInsertNonfull is: %d\n", x.numTreeObjects);
+                        //System.out.printf("\nThe number of tree objects in the bTreeInsertNonfull is: %d\n", x.numTreeObjects);
                         diskWrite(x.globalOffset, x);
                 }
                 else{
-                                System.out.printf("\ni's value is: %d\n", i);
+                                //System.out.printf("\ni's value is: %d\n", i);
                         while(i >= 0 && k < x.treeO[i].key){
                                 i--;
                         }
                         i++;
-                        System.out.printf("\ni's value is: %d\n", i);
-                        System.out.printf("\nThe child pointer is: %d\n", x.childPointers[i]);
-                        System.out.printf("\nThe size of the bin file is: %d\n", dis.length());
+                        //System.out.printf("\ni's value is: %d\n", i);
+                        //System.out.printf("\nThe child pointer is: %d\n", x.childPointers[i]);
+                        //System.out.printf("\nThe size of the bin file is: %d\n", dis.length());
                         BTreeNode child = diskRead(x.childPointers[i]);
                         if(child.numTreeObjects == 2*t-1){
                                 bTreeSplitChild(x, i);
@@ -160,7 +158,7 @@ public class BTree {
                 //write to specified offset or end of file, end of file can be reached with a negative offset argument
                         //? not sure if it should be dis.length()-1 , I would think it would just be dis.length(), but if I do dis.length() I get errors
                 if(offset < 0){
-                                System.out.printf("\n-----------------------------------------------------------The dis.length() is: %d\n", dis.length());
+                                //System.out.printf("\n-----------------------------------------------------------The dis.length() is: %d\n", dis.length());
                         dis.seek(dis.length()-1);
                 }
                 else{
@@ -168,8 +166,8 @@ public class BTree {
                 }
                 
                 //write the current position of the binary file, write first to get the correct starting position for the node
-                System.out.printf("\n1The dis.getFilePointer() is: %d\n", dis.getFilePointer());
-                System.out.printf("\n2The dis.getFilePointer() is: %d\n", dis.getFilePointer());
+                //System.out.printf("\n1The dis.getFilePointer() is: %d\n", dis.getFilePointer());
+                //System.out.printf("\n2The dis.getFilePointer() is: %d\n", dis.getFilePointer());
                 dis.writeLong(dis.getFilePointer());
                 dis.writeBoolean(node.leaf);
                 dis.writeInt(node.numTreeObjects);
@@ -208,7 +206,7 @@ public class BTree {
                 // (2t-1)(12) + (2t+1)(4) + 13 <= 4096
                 // t <= 127
                 
-                System.out.printf("\nThe input offset value is: %d\n", offset);
+                //System.out.printf("\nThe input offset value is: %d\n", offset);
                 
                 long globalOffset;
                 boolean leaf;
@@ -242,23 +240,65 @@ public class BTree {
         
         public void inOrderPrintToDump(BTreeNode n) throws IOException{
         	
-        	if(n.leaf){
-        		for(int i = 0; i < (2*t)-1; i++){
-            		bw.write(n.treeO[i].key + ":  " + n.treeO[i].frequency + "\n");
-            		bw.newLine();
+        	try {
+         	    
+        		if(n.leaf){
+            		for(int i = 0; i < n.numTreeObjects; i++){
+            			bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(Long.toBinaryString(n.treeO[i].key)));
+                		bw.newLine();
+                	}
             	}
-        	}
-        	else{
-        		for(int i = 0; i < (2*t)-1; i++){
-            		inOrderPrintToDump(diskRead(n.childPointers[i]));
-            		bw.write(n.treeO[i].key + ":  " + n.treeO[i].frequency + "\n");
-            		bw.newLine();
+            	else{
+            		for(int i = 0; i < n.numTreeObjects; i++){
+                		inOrderPrintToDump(diskRead(n.childPointers[i]));
+                		bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(Long.toBinaryString(n.treeO[i].key)));
+                		bw.newLine();
+                	}
+                	//giving errors, but should be there
+            		//visit right subtree
+                	//inOrderPrintToDump(diskRead(n.childPointers[n.numTreeObjects]));
             	}
-            	
-            	inOrderPrintToDump(diskRead(n.childPointers[(2*t)-1]));
-        	}
+        
+        	} 
+        	catch (IOException e) {
+     		   e.printStackTrace();
+     		   bw.close();
+     	   	}
+        	
+        	
         	
     		
     	}
+        
+        public String binaryToSequence(String binary){
+        	String dnaSequenceString = "";
+        	
+        	for(int base = 0; base < binary.length()-1; base += 2){
+        		dnaSequenceString += this.baseBinToChar(binary.substring(base, base+2));
+        	}
+        	
+        	return dnaSequenceString;
+        }
+        
+        public char baseBinToChar(String st){
+        	
+        	if(st.equals("00")){
+        		return 'A';
+        	}
+        	else if(st.equals("11")){
+        		return 'T';
+        	}
+        	else if(st.equals("01")){
+        		return 'G';
+        	}
+        	else if(st.equals("10")){
+        		return 'C';
+        	}
+        	else{
+        		//System.out.println("'"+st+"'");
+        		return 'N';
+        	}
+        	
+        }
 
 }
