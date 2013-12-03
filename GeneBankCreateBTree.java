@@ -250,26 +250,31 @@ public class GeneBankCreateBTree {
        
        if(debugLevel == 1){
     	   //write to dump file inorder traversal
+    	   tree.inOrderPrintToDump(tree.diskRead(tree.byteOffsetRoot));
        }
 
+       tree.bw.close();
+		
        /* Diagnosing read/write issues
-       System.out.printf("\nThe size of the bin file before anything is written: %d\n", tree.dis.length());
-       
-       //tree.diskWrite(-1, tree.root);
-       //tree.diskWrite(-1, tree.root);
+       //System.out.printf("\nThe size of the bin file before anything is written: %d\n", tree.dis.length());
+       long firstDiskWriteLocation = tree.dis.length()-1;
+       tree.diskWrite(-1, tree.root);
+       long secondDiskWriteLocation = tree.dis.length()-1;
+       tree.diskWrite(-1, tree.root);
        //BTreeNode test = tree.diskRead(0);
        
-       tree.dis.writeInt(5);
-       tree.dis.seek(tree.dis.length());
-       tree.dis.writeInt(2147483647);
+       //tree.dis.writeInt(5);
+       //tree.dis.seek(tree.dis.length());
+       //tree.dis.writeInt(2147483647);
        
-       System.out.printf("\nThe size of the bin file after int is written: %d\n", tree.dis.length());
+       //System.out.printf("\nThe size of the bin file after int is written: %d\n", tree.dis.length());
        
-       tree.dis.seek(0);
+       //tree.dis.seek(0);
+       System.out.println(firstDiskWriteLocation);
+       System.out.println(secondDiskWriteLocation);
        
-       
-       System.out.println(tree.dis.readInt());
-       System.out.println(tree.dis.readInt());
+       System.out.println(tree.diskRead(firstDiskWriteLocation).globalOffset);
+       System.out.println(tree.diskRead(secondDiskWriteLocation).globalOffset);
        */
        
     }
