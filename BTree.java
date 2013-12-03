@@ -67,6 +67,7 @@ public class BTree {
                 diskWrite(-1, z);
                 //write x in same position
                 diskWrite(x.globalOffset, x);
+                
         }
         
         public void bTreeInsert(long k) throws IOException{
@@ -166,6 +167,9 @@ public class BTree {
                         dis.writeLong(node.treeO[i].key);
                                     
                 }
+                
+                //write buffer byte
+                dis.writeBoolean(false);
                 
         }
         
