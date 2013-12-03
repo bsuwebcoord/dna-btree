@@ -12,6 +12,7 @@ public class BTree {
         File file = null;
         FileWriter fw = null;
         BufferedWriter bw = null;
+        String fullBinaryString = "";
         
         public BTree(int degree) throws IOException{
                 
@@ -244,15 +245,34 @@ public class BTree {
          	    
         		if(n.leaf){
             		for(int i = 0; i < n.numTreeObjects; i++){
-            			bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(Long.toBinaryString(n.treeO[i].key)));
+            			
+            			//add the leading zeros to the binary string
+            			fullBinaryString = "";
+            			for(int j = 0; j < Long.numberOfLeadingZeros(n.treeO[i].key); j++){
+            				fullBinaryString += "0";
+            			}
+            			
+            			fullBinaryString += Long.toBinaryString(n.treeO[i].key);
+            			
+            			bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(fullBinaryString));
                 		bw.newLine();
                 	}
             	}
             	else{
             		for(int i = 0; i < n.numTreeObjects; i++){
                 		inOrderPrintToDump(diskRead(n.childPointers[i]));
-                		bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(Long.toBinaryString(n.treeO[i].key)));
+                		
+                		//add the leading zeros to the binary string
+            			fullBinaryString = "";
+            			for(int j = 0; j < Long.numberOfLeadingZeros(n.treeO[i].key); j++){
+            				fullBinaryString += "0";
+            			}
+            			
+            			fullBinaryString += Long.toBinaryString(n.treeO[i].key);
+            			
+            			bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(fullBinaryString));
                 		bw.newLine();
+                		
                 	}
                 	//giving errors, but should be there
             		//visit right subtree
