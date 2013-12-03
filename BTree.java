@@ -8,13 +8,33 @@ public class BTree {
         long byteOffsetRoot = 0;
         RandomAccessFile dis;
         int[] childrenInitializer = null;
-                TreeObject[] treeObjectInitializer = null;
+        TreeObject[] treeObjectInitializer = null;
+        File file = null;
+        FileWriter fw = null;
+        BufferedWriter bw = null;
         
         
         //similar to B-Tree-Create code in book p. 492
         public BTree(int degree) throws IOException{
                 
                         t = degree;
+                        
+                      //open the dump file
+                        try {
+                     	    
+                   			file = new File("dump.txt");
+                    
+                   			// if file doesnt exists, then create it
+                   			if (!file.exists()) {
+                   				file.createNewFile();
+                   			}
+                    
+                   			fw = new FileWriter(file.getAbsoluteFile());
+                   			bw = new BufferedWriter(fw);
+                    
+                 	   } catch (IOException e) {
+                 		   e.printStackTrace();
+                 	   }
                 
         }
         
@@ -140,7 +160,7 @@ public class BTree {
                 //write to specified offset or end of file, end of file can be reached with a negative offset argument
                         //? not sure if it should be dis.length()-1 , I would think it would just be dis.length(), but if I do dis.length() I get errors
                 if(offset < 0){
-                		System.out.printf("\n-----------------------------------------------------------The dis.length() is: %d\n", dis.length());
+                                System.out.printf("\n-----------------------------------------------------------The dis.length() is: %d\n", dis.length());
                         dis.seek(dis.length()-1);
                 }
                 else{
@@ -219,5 +239,26 @@ public class BTree {
             return new BTreeNode((int)globalOffset, leaf, numTreeObjects, parentPointer, childPointers, treeO);
                 
         }
+        
+        public void inOrderPrintToDump(BTreeNode n) throws IOException{
+        	
+        	if(n.leaf){
+        		for(int i = 0; i < (2*t)-1; i++){
+            		bw.write(n.treeO[i].key + ":  " + n.treeO[i].frequency + "\n");
+            		bw.newLine();
+            	}
+        	}
+        	else{
+        		for(int i = 0; i < (2*t)-1; i++){
+            		inOrderPrintToDump(diskRead(n.childPointers[i]));
+            		bw.write(n.treeO[i].key + ":  " + n.treeO[i].frequency + "\n");
+            		bw.newLine();
+            	}
+            	
+            	inOrderPrintToDump(diskRead(n.childPointers[(2*t)-1]));
+        	}
+        	
+    		
+    	}
 
 }
