@@ -200,6 +200,9 @@ public class GeneBankCreateBTree {
        tree.dis.writeInt(tree.t);
        tree.dis.writeLong(tree.byteOffsetRoot);
        
+       //write a buffer byte
+       tree.dis.writeBoolean(false);
+       
        Parser parse = new Parser (seqLength, gbkFileName);
        
        long binarySequence = parse.nextBinSequence();
@@ -233,7 +236,23 @@ public class GeneBankCreateBTree {
                binarySequence = parse.nextBinSequence();
        }
        
-       /*
+       tree.byteOffsetRoot = tree.dis.length()-1;
+       
+       //write the root node to disk after building the BTree
+       tree.diskWrite(-1, tree.root);
+       
+       //write the metadata to disk
+       tree.dis.seek(0);
+       //need to update the numTreeNodes properly
+       tree.dis.writeInt(tree.numTreeNodes);
+       tree.dis.writeInt(tree.t);
+       tree.dis.writeLong(tree.byteOffsetRoot);
+       
+       if(debugLevel == 1){
+    	   //write to dump file inorder traversal
+       }
+
+       /* Diagnosing read/write issues
        System.out.printf("\nThe size of the bin file before anything is written: %d\n", tree.dis.length());
        
        //tree.diskWrite(-1, tree.root);
