@@ -182,8 +182,12 @@ public class GeneBankCreateBTree {
                 tree.root = new BTreeNode(0, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
        
        try{
+    	   
+    	   		
               
-               tree.dis = new RandomAccessFile("gbkfile.bin", "rw");
+    	   tree.dis = new RandomAccessFile(gbkFileName +  ".btree.data." + seqLength + "." + degree, "rw");
+               
+               
                
        }
        catch(FileNotFoundException e){
@@ -210,7 +214,12 @@ public class GeneBankCreateBTree {
        
        //insert or update all subsequences from the gbk file until the end of the file is reached
        
+       int sequenceNumber = 0;
+       
        while(binarySequence != -1){
+    	   
+    	   		System.out.println("Sequence number: " + sequenceNumber);
+    	   		sequenceNumber++;
                
                foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
                
@@ -249,7 +258,9 @@ public class GeneBankCreateBTree {
        tree.dis.writeLong(tree.byteOffsetRoot);
        
        if(debugLevel == 1){
-    	   //write to dump file inorder traversal
+    	   //write to dump file inorder traversal starting at root
+    	   tree.bw.write("frequency:  sequence");
+    	   tree.bw.newLine();
     	   tree.inOrderPrintToDump(tree.diskRead(tree.byteOffsetRoot));
        }
 
