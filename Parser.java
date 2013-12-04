@@ -18,7 +18,7 @@ public class Parser {
         fileName = a;
         entireDNASequence = dnaSequence();
         dna2Long(dnaSequence());
-        subEnd = i-1;
+        subEnd = i;
         
     }
     
@@ -182,9 +182,7 @@ public class Parser {
                     return dnaBinStr;
             
     }
-    
         
-            
     public String dnaBase(char ch){
             
             switch(ch){
