@@ -205,7 +205,7 @@ public class GeneBankCreateBTree {
        tree.dis.writeLong(tree.byteOffsetRoot);
        
        //write a buffer byte
-       tree.dis.writeBoolean(false);
+       //tree.dis.writeBoolean(false);
        
        Parser parse = new Parser (seqLength, gbkFileName);
        
@@ -231,23 +231,43 @@ public class GeneBankCreateBTree {
                }
                //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
                else{
-                       BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+            	   //System.out.println("The key was found");
+            	   
+            	   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+            	   
+            	   
                        
-                       int i = 0;
+            	   int i = 0;
                
-               while(binarySequence != updatedNode.treeO[i].key){
-                       i++;
-               }
-               updatedNode.treeO[i].frequency++;
-               
-               tree.diskWrite(updatedNode.globalOffset, updatedNode);
+	               while(binarySequence != updatedNode.treeO[i].key){
+	                       i++;
+	               }
+	               
+	               //System.out.printf("\nThe binary sequence being compared: %d\n", binarySequence);
+	               //System.out.printf("\nThe key in the node is: %d\n", updatedNode.treeO[i].key);
+	               
+	               //System.out.printf("\nThe frequency before increment is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               updatedNode.treeO[i].frequency++;
+	               
+	               //System.out.printf("\nThe frequency after increment is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               tree.diskWrite(updatedNode.globalOffset, updatedNode);
+	               
+	               //updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+	               
+	               //System.out.printf("\nThe frequency after writing to disk is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               //updatedNode = tree.diskRead(updatedNode.globalOffset);
+	               
+	               //System.out.printf("\nThe frequency after writing to disk using updatednode.globalOffset is: %d\n", updatedNode.treeO[i].frequency);
                
                }
                
                binarySequence = parse.nextBinSequence();
        }
        
-       tree.byteOffsetRoot = tree.dis.length()-1;
+       tree.byteOffsetRoot = tree.dis.length();
        
        //write the root node to disk after building the BTree
        tree.diskWrite(-1, tree.root);
