@@ -171,15 +171,16 @@ public class GeneBankCreateBTree {
        tree.childrenInitializer = new int[2*tree.t];
        tree.treeObjectInitializer = new TreeObject[(2*tree.t)-1];
         
-                //initialize the child array and tree object array to a constant size in order to read correctly
-                for(int i = 0; i < tree.treeObjectInitializer.length; i++){
-                        tree.childrenInitializer[i] = 0;
-                        tree.treeObjectInitializer[i] = new TreeObject(0,0);
-                }
-                //initialize the last item in the child array that wasn't covered by the for loop above
-                tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
+       //initialize the child array and tree object array to a constant size in order to read correctly
+       for(int i = 0; i < tree.treeObjectInitializer.length; i++){
+    	   tree.childrenInitializer[i] = 0;
+    	   tree.treeObjectInitializer[i] = new TreeObject(0,0);
+       }
+       //initialize the last item in the child array that wasn't covered by the for loop above
+       tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
         
-                tree.root = new BTreeNode(0, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
+       //the -2 is important to identify the root node
+       tree.root = new BTreeNode(-2, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
        
        try{
     	   
@@ -228,6 +229,16 @@ public class GeneBankCreateBTree {
                //if the key wasn't found, insert it into the BTree
                if(foundKeyNodeGlobalPosition == -1){
                        tree.bTreeInsert(binarySequence);
+               }
+               //key was found in the root
+               else if(foundKeyNodeGlobalPosition == -2){
+            	   int i = 0;
+                   
+	               while(binarySequence != tree.root.treeO[i].key){
+	                       i++;
+	               }
+	               
+	               tree.root.treeO[i].frequency++;
                }
                //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
                else{
