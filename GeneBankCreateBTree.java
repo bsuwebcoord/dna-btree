@@ -11,7 +11,7 @@ public class GeneBankCreateBTree {
        int seqLength = 0;
        int debugLevel = 0;
        String gbkFileName = "";
-       Cache dnaCache;
+       Cache<BTreeNode> dnaCache = null;
        BTree tree =  null;
        
        //Error handling and setting values from user input:
@@ -30,7 +30,7 @@ public class GeneBankCreateBTree {
            }
            else if(args[0].equals("1")){
                withCache = true;
-               if(args.length < 4){
+               if(args.length < 5){
                        System.out.println();
                    System.out.println("You provided too few arguments.");
                    System.out.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
@@ -101,7 +101,7 @@ public class GeneBankCreateBTree {
                
                try{
                if(Integer.parseInt(args[4]) > 0){
-                       dnaCache = new Cache(Integer.parseInt(args[4]));
+                       dnaCache = new Cache<BTreeNode>(Integer.parseInt(args[4]));
                }
                else{
                    throw new RuntimeException("Error: Invalid fifth argument. Must be of the form <cache size>, where the cache size is greater than 0.");
