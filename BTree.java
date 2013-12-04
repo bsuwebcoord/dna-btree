@@ -61,7 +61,7 @@ public class BTree {
         
         public void bTreeSplitChild(BTreeNode x, int i) throws IOException{
                 BTreeNode y = diskRead(x.childPointers[i]);
-                BTreeNode z = new BTreeNode((int)dis.length()-1, y.leaf, t-1, y.parentPointer, childrenInitializer, treeObjectInitializer);
+                BTreeNode z = new BTreeNode((int)dis.length(), y.leaf, t-1, y.parentPointer, childrenInitializer, treeObjectInitializer);
                 for(int j = 0; j <= t-2; j++){
                         z.treeO[j].key = y.treeO[j+t].key;
                 }
@@ -161,7 +161,7 @@ public class BTree {
                         //? not sure if it should be dis.length()-1 , I would think it would just be dis.length(), but if I do dis.length() I get errors
                 if(offset < 0){
                                 //System.out.printf("\n-----------------------------------------------------------The dis.length() is: %d\n", dis.length());
-                        dis.seek(dis.length()-1);
+                        dis.seek(dis.length());
                 }
                 else{
                         dis.seek(offset);
@@ -189,9 +189,9 @@ public class BTree {
                 }
                 
                 //write buffer byte if writing to the end of the bin file
-                if(offset < 0){
-                	dis.writeBoolean(false);
-                }
+                //if(offset < 0){
+                //	dis.writeBoolean(false);
+                //}
                 
                 
         }
