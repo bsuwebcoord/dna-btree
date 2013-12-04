@@ -174,7 +174,7 @@ public class GeneBankCreateBTree {
        //initialize the child array and tree object array to a constant size in order to read correctly
        for(int i = 0; i < tree.treeObjectInitializer.length; i++){
     	   tree.childrenInitializer[i] = 0;
-    	   tree.treeObjectInitializer[i] = new TreeObject(0,0);
+    	   tree.treeObjectInitializer[i] = new TreeObject(1,0);
        }
        //initialize the last item in the child array that wasn't covered by the for loop above
        tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
