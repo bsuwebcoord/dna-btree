@@ -5,6 +5,7 @@ public class BTree {
         BTreeNode root = null;
         int numTreeNodes = 0;
         int t;
+        int sequenceLength = 0;
         long byteOffsetRoot = 0;
         RandomAccessFile dis;
         int[] childrenInitializer = null;
@@ -187,8 +188,11 @@ public class BTree {
                                     
                 }
                 
-                //write buffer byte
-                dis.writeBoolean(false);
+                //write buffer byte if writing to the end of the bin file
+                if(offset < 0){
+                	dis.writeBoolean(false);
+                }
+                
                 
         }
         
@@ -293,7 +297,7 @@ public class BTree {
         public String binaryToSequence(String binary){
         	String dnaSequenceString = "";
         	
-        	for(int base = 0; base < binary.length()-1; base += 2){
+        	for(int base = 64 - sequenceLength*2; base < binary.length()-1; base += 2){
         		dnaSequenceString += this.baseBinToChar(binary.substring(base, base+2));
         	}
         	
