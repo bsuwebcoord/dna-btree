@@ -177,7 +177,7 @@ public class GeneBankSearch {
          	   		i++;
 	            }
          	   	
-         	   	System.out.println(updatedNode.treeO[i].key);
+         	   	System.out.println(updatedNode.treeO[i].frequency);
 	           
         	}
         }
