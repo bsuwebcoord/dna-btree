@@ -209,6 +209,8 @@ public class GeneBankCreateBTree {
        
        Parser parse = new Parser (seqLength, gbkFileName);
        
+       tree.sequenceLength = seqLength;
+       
        long binarySequence = parse.nextBinSequence();
        long foundKeyNodeGlobalPosition = 0;
        
