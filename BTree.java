@@ -277,14 +277,18 @@ public class BTree {
             			bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(fullBinaryString));
                 		bw.newLine();
                 		
+                		//visit right subtree
+                		if(i == n.numTreeObjects-1){
+                			inOrderPrintToDump(diskRead(n.childPointers[i+1]));
+                		}
+                		
                 	}
-                	//giving errors, but should be there
-            		//visit right subtree
-                	//inOrderPrintToDump(diskRead(n.childPointers[n.numTreeObjects]));
+
             	}
         
         	} 
         	catch (IOException e) {
+        		System.out.println("Problem");
      		   e.printStackTrace();
      		   bw.close();
      	   	}
