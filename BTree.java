@@ -94,11 +94,13 @@ public class BTree {
                 BTreeNode r = root;
                 //System.out.printf("\nThe number of tree objects of root is: %d\n", root.numTreeObjects);
                 if(root.numTreeObjects == 2*t-1){
-                        BTreeNode s = new BTreeNode(-1, true, 0, 0, childrenInitializer, treeObjectInitializer);
+                		//the -2 globalOffset will write to the end of file since it's negative, and is a unique identifier for the root
+                        BTreeNode s = new BTreeNode(-2, true, 0, 0, childrenInitializer, treeObjectInitializer);
                         root = s;
                         s.leaf = false;
                         s.numTreeObjects = 0;
-                        s.childPointers[0] = r.globalOffset;
+                        s.childPointers[0] = (int)dis.length();
+                        diskWrite(-1, r);
                         bTreeSplitChild(s, 0);
                         bTreeInsertNonfull(s,k);
                 }
