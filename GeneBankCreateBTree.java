@@ -218,38 +218,62 @@ public class GeneBankCreateBTree {
        //insert or update all subsequences from the gbk file until the end of the file is reached
        
        int sequenceNumber = 0;
-       
-       while(binarySequence != -1){
+       /*
+       if(withCache){
     	   
-    	   		System.out.println("Sequence number: " + sequenceNumber);
-    	   		sequenceNumber++;
-               
-               foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
-               
-               //if the key wasn't found, insert it into the BTree
-               if(foundKeyNodeGlobalPosition == -1){
-                       tree.bTreeInsert(binarySequence);
-               }
-               //key was found in the root
-               else if(foundKeyNodeGlobalPosition == -2){
-            	   int i = 0;
-                   
+    	   BTreeNode deletedCacheNode = null;
+    	   
+    	   while(binarySequence != -1){
+        	   
+    		   System.out.println("Sequence number: " + sequenceNumber);
+   	   	   	   sequenceNumber++;
+              
+   	   	   	   //this will add the 
+   	   	   	   deletedCacheNode = dnaCache.getObject(binarySequence);
+   	   	   	   
+   	   	   	   if(deletedCacheNode != null){
+   	   	   		   for(int i = 0; i < deletedCacheNode.numTreeObjects; i++){
+   	   	   			   foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, deletedCacheNode.treeO[i].key);
+   	   	   			   
+   	   	   		   }
+   	   	   	   }
+              
+   	   	   	   binarySequence = parse.nextBinSequence();
+    	   }
+       }
+       */
+       //else{
+    	   while(binarySequence != -1){
+        	   
+   	   		System.out.println("Sequence number: " + sequenceNumber);
+   	   		sequenceNumber++;
+              
+              foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
+              
+              //if the key wasn't found, insert it into the BTree
+              if(foundKeyNodeGlobalPosition == -1){
+                      tree.bTreeInsert(binarySequence);
+              }
+              //key was found in the root
+              else if(foundKeyNodeGlobalPosition == -2){
+           	   int i = 0;
+                  
 	               while(binarySequence != tree.root.treeO[i].key){
 	                       i++;
 	               }
 	               
 	               tree.root.treeO[i].frequency++;
-               }
-               //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
-               else{
-            	   //System.out.println("The key was found");
-            	   
-            	   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
-            	   
-            	   
-                       
-            	   int i = 0;
-               
+              }
+              //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
+              else{
+           	   //System.out.println("The key was found");
+           	   
+           	   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+           	   
+           	   
+                      
+           	   int i = 0;
+              
 	               while(binarySequence != updatedNode.treeO[i].key){
 	                       i++;
 	               }
@@ -263,6 +287,9 @@ public class GeneBankCreateBTree {
 	               
 	               //System.out.printf("\nThe frequency after increment is: %d\n", updatedNode.treeO[i].frequency);
 	               
+	               //this is where the cache comes in, instead of writing to disk with the updated node, write to cache, then write to disk when node is bumped out, or program finished, write all cache nodes
+	               //each cache write should search for the node, which each have a unique globalOffset value, remove that node from the cache, and always move the written node to the front of the cache
+	               //if an item is deleted from the cache, it should do a diskWrite for that node, similar to the line below
 	               tree.diskWrite(updatedNode.globalOffset, updatedNode);
 	               
 	               //updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
@@ -272,11 +299,12 @@ public class GeneBankCreateBTree {
 	               //updatedNode = tree.diskRead(updatedNode.globalOffset);
 	               
 	               //System.out.printf("\nThe frequency after writing to disk using updatednode.globalOffset is: %d\n", updatedNode.treeO[i].frequency);
-               
-               }
-               
-               binarySequence = parse.nextBinSequence();
-       }
+              
+              }
+              
+              binarySequence = parse.nextBinSequence();
+    	   }
+       //}
        
        tree.byteOffsetRoot = tree.dis.length();
        
