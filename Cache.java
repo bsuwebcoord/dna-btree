@@ -27,31 +27,31 @@ public class Cache<E> {
                 foundInList = true;     
             }
         }
-        addObject(s);
         
-        if(foundInList){
-            return s;
-        }
-        else{
-            return null;
-        }
+        return addObject(s);
         
     }
 
     //adds object to the first position of cache
-    public void addObject(E s){
+    public E addObject(E s){
+    	
+    	E deletedObject = null;
         
         if(list.size() == cacheSize){
-            list.remove(cacheSize-1);
+            deletedObject = list.remove(cacheSize-1);
         }
         list.add(0, s);
         
+        //System.out.println(list.size());
+        
+        return deletedObject;
+        
     }
     
-    //removes object from index i of cache
-    public void removeObject(int i){
+    //removes object from index i of cache and returns it
+    public E removeObject(int i){
         
-        list.remove(i);
+        return list.remove(i);
         
     }
     
