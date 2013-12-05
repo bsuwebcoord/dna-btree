@@ -3,18 +3,18 @@ import java.io.*;
 public class GeneBankSearch {
 
     public static void main(String[] args) throws IOException {
-            
-            String bTreeFileName = "";
-            String queryFileName = "";
-            int degree = 0;
-            int debugLevel = 0;
-            boolean withCache = false;
-            long byteOffsetRoot = 0;
-            Cache<BTreeNode> dnaCache = null;
-            BTree tree = null;
-            RandomAccessFile dis = null;
-            
-            //Error handling and setting values from user input:
+    	
+    	String bTreeFileName = "";
+    	String queryFileName = "";
+    	int degree = 0;
+    	int debugLevel = 0;
+    	boolean withCache = false;
+    	long byteOffsetRoot = 0;
+    	Cache<BTreeNode> dnaCache = null;
+    	BTree tree =  null;
+    	RandomAccessFile dis = null;
+    	
+    	//Error handling and setting values from user input:
         
         if(args.length < 3 || args.length > 5){
             System.out.println();
@@ -79,27 +79,27 @@ public class GeneBankSearch {
             }
                 
             if(args.length == 5){
-                    try{
+            	try{
                         
-                            if(args[4].equals("0")){
-                                    //do nothing since debug level is already set to 0 by default
-                            }
-                            else if(args[4].equals("1")){
-                                    debugLevel = 1;
-                            }
-                            else{
-                                    throw new RuntimeException("Error: Invalid fifth argument. Must be of the form <debug level>, where the debug level is 0 or 1.");
-                            }
+            		if(args[4].equals("0")){
+            			//do nothing since debug level is already set to 0 by default
+            		}
+            		else if(args[4].equals("1")){
+            			debugLevel = 1;
+            		}
+            		else{
+            			throw new RuntimeException("Error: Invalid fifth argument. Must be of the form <debug level>, where the debug level is 0  or 1.");
+            		}
                         
-                    }
-                    catch(RuntimeException e){
+            	}
+            	catch(RuntimeException e){
                     
-                            System.out.println();
-                            System.out.println("RuntimeException: " + e.getMessage());
-                            System.out.println();
-                            System.exit(1);
+            		System.out.println();
+            		System.out.println("RuntimeException: " + e.getMessage());
+            		System.out.println();
+            		System.exit(1);
                         
-                    }
+            	}
             }
                 
         }
@@ -113,7 +113,7 @@ public class GeneBankSearch {
                             debugLevel = 1;
                     }
                     else{
-                        throw new RuntimeException("Error: Invalid fourth argument. Must be of the form <debug level>, where the debug level is 0 or 1.");
+                        throw new RuntimeException("Error: Invalid fourth argument. Must be of the form <debug level>, where the debug level is 0  or 1.");
                     }
                     
                 }
@@ -128,7 +128,7 @@ public class GeneBankSearch {
         }
         
         try{
-              dis = new RandomAccessFile(args[1], "rw");
+     	   dis = new RandomAccessFile(args[1], "rw"); 
         }
         catch(FileNotFoundException e){
                 
@@ -145,7 +145,7 @@ public class GeneBankSearch {
         
         tree = new BTree(degree);
         
-        //Parser parse = new Parser(-1, "");
+        Parser parse = new Parser(-1, "");
         
         long foundKeyNodeGlobalPosition = 0;
         long dnaLong = 0;
@@ -157,29 +157,29 @@ public class GeneBankSearch {
         BufferedReader br = new BufferedReader(new FileReader(queryFileName));
         String line;
         while ((line = br.readLine()) != null) {
-                
-                dnaLong = Long.parseLong(Parser.seq2Bin(line),2);
-                
-                //search the BTree for the sequence
-                foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, dnaLong);
-                
-                //if not found print 0
-                if(foundKeyNodeGlobalPosition == -1){
-                        System.out.println("0");
-                }
-                //else print the frequency
-                else{
-                        BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+        	
+        	dnaLong = Long.parseLong(parse.seq2Bin(line),2);
+        	
+        	//search the BTree for the sequence
+        	foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, dnaLong);
+        	
+        	//if not found print 0
+        	if(foundKeyNodeGlobalPosition == -1){
+        		System.out.println("0");
+        	}
+        	//else print the frequency
+        	else{
+        		BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
 
-                          int i = 0;
+         	   	int i = 0;
             
-                          while(dnaLong != updatedNode.treeO[i].key){
-                                  i++;
-         }
-                          
-                          System.out.println(updatedNode.treeO[i].frequency);
-        
-                }
+         	   	while(dnaLong != updatedNode.treeO[i].key){
+         	   		i++;
+	            }
+         	   	
+         	   	System.out.println(updatedNode.treeO[i].frequency);
+	           
+        	}
         }
         br.close();
         
