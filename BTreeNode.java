@@ -29,5 +29,15 @@ public class BTreeNode {
         childPointers = e;
         treeO = f;
     }
+    
+    
+    public TreeObject getTreeObject(long key){
+    	int i=0;
+    	while(i < this.numTreeObjects && key > this.treeO[i].key){
+            i++;
+    	}
+    	
+    	return this.treeO[i];
+    }
 
 }

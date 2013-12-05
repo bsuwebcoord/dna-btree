@@ -17,6 +17,7 @@ public class GeneBankSearch {
         String query_file = "";
         Cache dnaCache;
         BTree tree =  null;
+        RandomAccessFile dis;
         
         //Error handling and setting values from user input:
         
@@ -131,26 +132,37 @@ public class GeneBankSearch {
         
         
         
-        //get root node
-        //scan the query file
-        //search btree file for sequence (returns offset)
-        //readFile starting at offset (returns BTreeNode)
+        
         Scanner file;
-        tree = new BTree(3); //get degree by counting length of first line of query file
+        
         try{
         	file = new Scanner(new BufferedReader(new FileReader(query_file)));
+        	//get first line to count sequence length
             int seqLength = file.nextLine().length();
-            System.out.println("Seq Length: "+seqLength);
-            file.reset();
+            System.out.println("/nSeq Length: "+seqLength);
             
-            tree.dis = new RandomAccessFile(btree_file, "rw");
-            //get Root node
-            BTreeNode root = tree.diskRead(tree.byteOffsetRoot);
+            file.reset();//reset pointer back to beginning of query file
+            
+            dis = new RandomAccessFile(btree_file, "rw");
+            //get metadata
+            dis.readInt();//num treeNodes
+            int degree = dis.readInt();//degree
+            long byteOffsetRoot = dis.readLong();//byte offset of Root
+            
+            tree = new BTree(degree); 
+            tree.dis = dis; //point tree's RandomAccessFile to this dis
+            System.out.println("Degree: "+degree);
+            
+            BTreeNode root = tree.diskRead(byteOffsetRoot);
+            
             
             while(file.hasNextLine()){
-            	//convert file.nextLine() to long
-            	long sequence = 1;
-            	tree.diskRead(tree.bTreeSearch(root, sequence));
+            	String line = file.nextLine();
+            	//System.out.println("DNA: "+line);
+            	long sequence = Long.parseLong(Parser.seq2Bin(line));
+            	//System.out.println("DNALongValue: "+sequence);
+            	//BTreeNode node = tree.diskRead(tree.bTreeSearch(root, sequence));
+            	//System.out.println(node.getTreeObject(sequence));
             }
      	   
      	  

@@ -104,7 +104,7 @@ public class Parser {
                                         System.out.println("N appeared in the sequence");
                                 }else{
                                         
-                                        long dnaLong = Long.parseLong(this.seq2Bin(sequence),2);
+                                        long dnaLong = Long.parseLong(Parser.seq2Bin(sequence),2);
                                         TreeObject t = new TreeObject(1, dnaLong); 
                                         System.out.println(t);
                                         
@@ -171,19 +171,19 @@ public class Parser {
      * @param subsequence
      * @return
      */
-    public String seq2Bin(String  subsequence){
+    public static String seq2Bin(String  subsequence){
             
                     String dnaBinStr = "";
                     for (int ch = 0; ch < subsequence.length(); ch++) 
                 {
-                            dnaBinStr += this.dnaBase(subsequence.charAt(ch));
+                            dnaBinStr += Parser.dnaBase(subsequence.charAt(ch));
                 }
                     
                     return dnaBinStr;
             
     }
         
-    public String dnaBase(char ch){
+    public static String dnaBase(char ch){
             
             switch(ch){
                     case 'A':
