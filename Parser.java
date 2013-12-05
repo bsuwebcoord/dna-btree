@@ -14,12 +14,17 @@ public class Parser {
 
     //Constructor for Parser
     public Parser(int i, String a){
-        seqLength = i;
-        fileName = a;
-        entireDNASequence = dnaSequence();
-        dna2Long(dnaSequence());
-        subEnd = i;
-        
+    	if(i < 0){
+    		//do nothing, but you can use the methods in Parse
+    	}
+    	else{
+    		seqLength = i;
+            fileName = a;
+            entireDNASequence = dnaSequence();
+            dna2Long(dnaSequence());
+            subEnd = i;
+    	}
+     
     }
     
     /** Parse gbk file to full dna sequence string

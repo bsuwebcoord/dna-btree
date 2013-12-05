@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -6,9 +7,11 @@ import java.io.RandomAccessFile;
 import java.util.Scanner;
 
 
+
 public class GeneBankSearch {
 
     public static void main(String[] args) throws IOException {
+
     	
     	boolean withCache = false;
         
@@ -27,6 +30,7 @@ public class GeneBankSearch {
         
         if(args.length < 3 || args.length > 5){
                 System.out.println();
+
             System.out.println("You provided too few or too many arguments.");
             System.out.println("Arguments have the following form: <0/1(no/with Cache)> <btree file> <query file> [<cache size>] [<debug level>]");
             System.out.println();
@@ -39,8 +43,10 @@ public class GeneBankSearch {
             }
             else if(args[0].equals("1")){
                 withCache = true;
+
                 if(args.length < 3){
                         System.out.println();
+
                     System.out.println("You provided too few arguments.");
                     System.out.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
                     System.out.println();
@@ -61,17 +67,21 @@ public class GeneBankSearch {
             
         }
         
+
       //if a cache was specified, check that the fifth argument is in the correct form
         if(args[0].equals("1")){
                 
                 try{
                 if(Integer.parseInt(args[3]) > 0){
                         dnaCache = new Cache(Integer.parseInt(args[4]));
+
                 }
                 else{
                     throw new RuntimeException("Error: Invalid fourth argument. Must be of the form <cache size>, where the cache size is greater than 0.");
                 }
+
                 
+
             }
             catch(RuntimeException e){
             
@@ -82,6 +92,7 @@ public class GeneBankSearch {
                 
             }
                 
+
                 
           if(args.length == 5){
             try{
@@ -167,6 +178,7 @@ public class GeneBankSearch {
      	   
      	  
                 
+
         }
         catch(FileNotFoundException e){
                 
@@ -176,6 +188,7 @@ public class GeneBankSearch {
                         System.exit(1);
                 
         }
+
        
     }
 

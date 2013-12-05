@@ -11,7 +11,7 @@ public class GeneBankCreateBTree {
        int seqLength = 0;
        int debugLevel = 0;
        String gbkFileName = "";
-       Cache dnaCache;
+       Cache<BTreeNode> dnaCache = null;
        BTree tree =  null;
        
        //Error handling and setting values from user input:
@@ -30,7 +30,7 @@ public class GeneBankCreateBTree {
            }
            else if(args[0].equals("1")){
                withCache = true;
-               if(args.length < 4){
+               if(args.length < 5){
                        System.out.println();
                    System.out.println("You provided too few arguments.");
                    System.out.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
@@ -101,7 +101,7 @@ public class GeneBankCreateBTree {
                
                try{
                if(Integer.parseInt(args[4]) > 0){
-                       dnaCache = new Cache(Integer.parseInt(args[4]));
+                       dnaCache = new Cache<BTreeNode>(Integer.parseInt(args[4]));
                }
                else{
                    throw new RuntimeException("Error: Invalid fifth argument. Must be of the form <cache size>, where the cache size is greater than 0.");
@@ -171,15 +171,16 @@ public class GeneBankCreateBTree {
        tree.childrenInitializer = new int[2*tree.t];
        tree.treeObjectInitializer = new TreeObject[(2*tree.t)-1];
         
-                //initialize the child array and tree object array to a constant size in order to read correctly
-                for(int i = 0; i < tree.treeObjectInitializer.length; i++){
-                        tree.childrenInitializer[i] = 0;
-                        tree.treeObjectInitializer[i] = new TreeObject(0,0);
-                }
-                //initialize the last item in the child array that wasn't covered by the for loop above
-                tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
+       //initialize the child array and tree object array to a constant size in order to read correctly
+       for(int i = 0; i < tree.treeObjectInitializer.length; i++){
+    	   tree.childrenInitializer[i] = 0;
+    	   tree.treeObjectInitializer[i] = new TreeObject(1,0);
+       }
+       //initialize the last item in the child array that wasn't covered by the for loop above
+       tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
         
-                tree.root = new BTreeNode(0, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
+       //the -2 is important to identify the root node
+       tree.root = new BTreeNode(-2, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
        
        try{
     	   
@@ -205,7 +206,7 @@ public class GeneBankCreateBTree {
        tree.dis.writeLong(tree.byteOffsetRoot);
        
        //write a buffer byte
-       tree.dis.writeBoolean(false);
+       //tree.dis.writeBoolean(false);
        
        Parser parse = new Parser (seqLength, gbkFileName);
        
@@ -229,25 +230,55 @@ public class GeneBankCreateBTree {
                if(foundKeyNodeGlobalPosition == -1){
                        tree.bTreeInsert(binarySequence);
                }
+               //key was found in the root
+               else if(foundKeyNodeGlobalPosition == -2){
+            	   int i = 0;
+                   
+	               while(binarySequence != tree.root.treeO[i].key){
+	                       i++;
+	               }
+	               
+	               tree.root.treeO[i].frequency++;
+               }
                //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
                else{
-                       BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+            	   //System.out.println("The key was found");
+            	   
+            	   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+            	   
+            	   
                        
-                       int i = 0;
+            	   int i = 0;
                
-               while(binarySequence != updatedNode.treeO[i].key){
-                       i++;
-               }
-               updatedNode.treeO[i].frequency++;
-               
-               tree.diskWrite(updatedNode.globalOffset, updatedNode);
+	               while(binarySequence != updatedNode.treeO[i].key){
+	                       i++;
+	               }
+	               
+	               //System.out.printf("\nThe binary sequence being compared: %d\n", binarySequence);
+	               //System.out.printf("\nThe key in the node is: %d\n", updatedNode.treeO[i].key);
+	               
+	               //System.out.printf("\nThe frequency before increment is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               updatedNode.treeO[i].frequency++;
+	               
+	               //System.out.printf("\nThe frequency after increment is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               tree.diskWrite(updatedNode.globalOffset, updatedNode);
+	               
+	               //updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+	               
+	               //System.out.printf("\nThe frequency after writing to disk is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               //updatedNode = tree.diskRead(updatedNode.globalOffset);
+	               
+	               //System.out.printf("\nThe frequency after writing to disk using updatednode.globalOffset is: %d\n", updatedNode.treeO[i].frequency);
                
                }
                
                binarySequence = parse.nextBinSequence();
        }
        
-       tree.byteOffsetRoot = tree.dis.length()-1;
+       tree.byteOffsetRoot = tree.dis.length();
        
        //write the root node to disk after building the BTree
        tree.diskWrite(-1, tree.root);
