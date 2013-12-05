@@ -39,5 +39,16 @@ public class BTreeNode {
     	
     	return this.treeO[i];
     }
+    
+    public Boolean equals(BTreeNode x){
+    	
+    	if(globalOffset == x.globalOffset){
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
+    	
+    }
 
 }
