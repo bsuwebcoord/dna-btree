@@ -145,7 +145,7 @@ public class GeneBankSearch {
         
         tree = new BTree(degree);
         
-        Parser parse = new Parser(-1, "");
+        //Parser parse = new Parser(-1, "");
         
         long foundKeyNodeGlobalPosition = 0;
         long dnaLong = 0;
@@ -158,7 +158,7 @@ public class GeneBankSearch {
         String line;
         while ((line = br.readLine()) != null) {
                 
-                dnaLong = Long.parseLong(parse.seq2Bin(line),2);
+                dnaLong = Long.parseLong(Parser.seq2Bin(line),2);
                 
                 //search the BTree for the sequence
                 foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, dnaLong);

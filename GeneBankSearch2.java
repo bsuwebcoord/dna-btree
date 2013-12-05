@@ -170,13 +170,13 @@ public class GeneBankSearch2 {
             while(file.hasNextLine()){
             	String line = file.nextLine();
             	//System.out.println("DNA: "+line);
-            	long sequence = Long.parseLong(Parser.seq2Bin(line));
+            	long sequence = Long.parseLong(Parser.seq2Bin(line),2);
             	//System.out.println("DNALongValue: "+sequence);
-            	//BTreeNode node = tree.diskRead(tree.bTreeSearch(root, sequence));
-            	//System.out.println(node.getTreeObject(sequence));
+            	BTreeNode node = tree.diskRead(tree.bTreeSearch(root, sequence));
+            	System.out.println(node.getTreeObject(sequence));
             }
      	   
-     	  
+     	  file.close();
                 
 
         }
