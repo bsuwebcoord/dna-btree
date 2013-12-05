@@ -13,6 +13,7 @@ public class GeneBankCreateBTree {
        String gbkFileName = "";
        Cache<BTreeNode> dnaCache = null;
        BTree tree =  null;
+       BTreeNode deletedNode = null;
        
        //Error handling and setting values from user input:
        
@@ -245,7 +246,7 @@ public class GeneBankCreateBTree {
        //else{
     	   while(binarySequence != -1){
         	   
-   	   		System.out.println("Sequence number: " + sequenceNumber);
+   	   		//System.out.println("Sequence number: " + sequenceNumber);
    	   		sequenceNumber++;
               
               foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
@@ -290,7 +291,20 @@ public class GeneBankCreateBTree {
 	               //this is where the cache comes in, instead of writing to disk with the updated node, write to cache, then write to disk when node is bumped out, or program finished, write all cache nodes
 	               //each cache write should search for the node, which each have a unique globalOffset value, remove that node from the cache, and always move the written node to the front of the cache
 	               //if an item is deleted from the cache, it should do a diskWrite for that node, similar to the line below
-	               tree.diskWrite(updatedNode.globalOffset, updatedNode);
+	               if(withCache){
+	            	   //System.out.println("Got to first withCache");
+	            	   
+	            	   deletedNode = dnaCache.addObject(updatedNode);
+	            	   
+	            	   //if a node was bumped out of the cache, write it to the disk
+	            	   if(deletedNode != null){
+	            		   tree.diskWrite(deletedNode.globalOffset, deletedNode);
+	            	   }
+	               }
+	               else{
+	            	   tree.diskWrite(updatedNode.globalOffset, updatedNode);
+	               }
+	               
 	               
 	               //updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
 	               
@@ -303,6 +317,18 @@ public class GeneBankCreateBTree {
               }
               
               binarySequence = parse.nextBinSequence();
+    	   }
+    	   
+    	   
+    	   
+    	   if(withCache){
+    		   //System.out.println("Got here");
+    		   //remove each item from the cache and write it to the disk
+    		   for(int k = dnaCache.list.size()-1; k > -1; k--){
+    			   //System.out.println(k);
+    			   deletedNode = dnaCache.removeObject(k);
+    			   tree.diskWrite(deletedNode.globalOffset, deletedNode);
+    		   }
     	   }
        //}
        
