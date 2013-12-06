@@ -10,7 +10,7 @@ public class GeneBankSearch {
     	int debugLevel = 0;
     	boolean withCache = false;
     	long byteOffsetRoot = 0;
-    	Cache<BTreeNode> dnaCache = null;
+    	Cache dnaCache = null;
     	BTree tree =  null;
     	RandomAccessFile dis = null;
     	
@@ -63,7 +63,7 @@ public class GeneBankSearch {
                 
             try{
                 if(Integer.parseInt(args[3]) > 0){
-                        dnaCache = new Cache<BTreeNode>(Integer.parseInt(args[4]));
+                        dnaCache = new Cache(Integer.parseInt(args[4]));
                 }
                 else{
                     throw new RuntimeException("Error: Invalid fourth argument. Must be of the form <cache size>, where the cache size is greater than 0.");
