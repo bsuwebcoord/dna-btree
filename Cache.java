@@ -1,11 +1,10 @@
-
 import java.util.*;
-public class Cache<E> {
+public class Cache {
     
     public int cacheSize;
     public int hits;
     public int references;
-    List<E> list = new LinkedList<E>();
+    List<BTreeNode> list = new LinkedList<BTreeNode>();
         
     //constructor
     public Cache(int i){
@@ -13,29 +12,36 @@ public class Cache<E> {
     }
         
     //returns object if object s is found in the cache, adds object to cache regardless of hit or miss
-    public E getObject(E s){
+    public BTreeNode getObject(BTreeNode s, int j){
         
         references++;
         Boolean foundInList = false;
+        BTreeNode nextNode = null;
         
-        Iterator<E> x = list.listIterator(0);
+        Iterator<BTreeNode> x = list.listIterator(0);
         
         while(x.hasNext() && !foundInList){
-            if(s.equals(x.next())){
+        	
+        	nextNode = x.next();
+        	
+            if(s.equals(nextNode)){
                 x.remove();
                 hits++;
-                foundInList = true;     
+                foundInList = true;
+                s = nextNode;
             }
         }
+        
+        s.treeO[j].frequency++;
         
         return addObject(s);
         
     }
 
     //adds object to the first position of cache
-    public E addObject(E s){
+    public BTreeNode addObject(BTreeNode s){
     	
-    	E deletedObject = null;
+    	BTreeNode deletedObject = null;
         
         if(list.size() == cacheSize){
             deletedObject = list.remove(cacheSize-1);
@@ -49,7 +55,7 @@ public class Cache<E> {
     }
     
     //removes object from index i of cache and returns it
-    public E removeObject(int i){
+    public BTreeNode removeObject(int i){
         
         return list.remove(i);
         
