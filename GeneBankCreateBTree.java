@@ -11,7 +11,7 @@ public class GeneBankCreateBTree {
        int seqLength = 0;
        int debugLevel = 0;
        String gbkFileName = "";
-       Cache<BTreeNode> dnaCache = null;
+       Cache dnaCache = null;
        BTree tree =  null;
        BTreeNode deletedNode = null;
        
@@ -102,7 +102,7 @@ public class GeneBankCreateBTree {
                
                try{
                if(Integer.parseInt(args[4]) > 0){
-                       dnaCache = new Cache<BTreeNode>(Integer.parseInt(args[4]));
+                       dnaCache = new Cache(Integer.parseInt(args[4]));
                }
                else{
                    throw new RuntimeException("Error: Invalid fifth argument. Must be of the form <cache size>, where the cache size is greater than 0.");
@@ -253,7 +253,19 @@ public class GeneBankCreateBTree {
               
               //if the key wasn't found, insert it into the BTree
               if(foundKeyNodeGlobalPosition == -1){
-                      tree.bTreeInsert(binarySequence);
+            	  
+            	  //when using cache, first remove all nodes from cache and update the tree with those nodes
+            	  if(withCache){
+            		  
+	            		//remove each item from the cache and write it to the disk
+	   	       		   for(int k = dnaCache.list.size()-1; k > -1; k--){
+	   	       			   System.out.println(k);
+	   	       			   deletedNode = dnaCache.removeObject(k);
+	   	       			   tree.diskWrite(deletedNode.globalOffset, deletedNode);
+	   	       		   }
+            	  }
+	            	
+                   tree.bTreeInsert(binarySequence);
               }
               //key was found in the root
               else if(foundKeyNodeGlobalPosition == -2){
@@ -284,7 +296,7 @@ public class GeneBankCreateBTree {
 	               
 	               //System.out.printf("\nThe frequency before increment is: %d\n", updatedNode.treeO[i].frequency);
 	               
-	               updatedNode.treeO[i].frequency++;
+	               
 	               
 	               //System.out.printf("\nThe frequency after increment is: %d\n", updatedNode.treeO[i].frequency);
 	               
@@ -294,7 +306,7 @@ public class GeneBankCreateBTree {
 	               if(withCache){
 	            	   //System.out.println("Got to first withCache");
 	            	   
-	            	   deletedNode = dnaCache.addObject(updatedNode);
+	            	   deletedNode = dnaCache.getObject(updatedNode, i);
 	            	   
 	            	   //if a node was bumped out of the cache, write it to the disk
 	            	   if(deletedNode != null){
@@ -302,6 +314,7 @@ public class GeneBankCreateBTree {
 	            	   }
 	               }
 	               else{
+	            	   updatedNode.treeO[i].frequency++;
 	            	   tree.diskWrite(updatedNode.globalOffset, updatedNode);
 	               }
 	               
@@ -322,10 +335,10 @@ public class GeneBankCreateBTree {
     	   
     	   
     	   if(withCache){
-    		   //System.out.println("Got here");
+    		   //System.out.println("Last cache dump");
     		   //remove each item from the cache and write it to the disk
     		   for(int k = dnaCache.list.size()-1; k > -1; k--){
-    			   //System.out.println(k);
+    			   System.out.println(k);
     			   deletedNode = dnaCache.removeObject(k);
     			   tree.diskWrite(deletedNode.globalOffset, deletedNode);
     		   }
