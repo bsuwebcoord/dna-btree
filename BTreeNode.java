@@ -40,6 +40,16 @@ public class BTreeNode {
     	return this.treeO[i];
     }
     
+    public  void printNode(){
+    	
+    	System.out.println("Printing node");
+    	
+    	for(int i = 0; i < childPointers.length; i++){
+    		//System.out.println(childPointers.length);
+    		//System.out.println(childPointers[i]);
+    	}
+    }
+    
     public Boolean equals(BTreeNode x){
     	
     	if(globalOffset == x.globalOffset){
