@@ -245,6 +245,8 @@ public class GeneBankCreateBTree {
        */
        //else{
     	   while(binarySequence != -1){
+    		   
+    		   System.out.printf("The number of tree nodes is: %d\n", tree.numTreeNodes);
         	   
    	   		//System.out.println("Sequence number: " + sequenceNumber);
    	   		sequenceNumber++;
