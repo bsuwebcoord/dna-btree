@@ -135,7 +135,7 @@ public class BTree {
         public void bTreeInsertNonfull(BTreeNode x, long k) throws IOException{
                         //added the subtraction of i by 1 to avoid indexOutOfBounds exception
                         //System.out.printf("\nThe number of tree objects of x is: %d\n", x.numTreeObjects);
-        	x.printNode();
+        	//x.printNode();
         	System.out.println(k);
         	
         	
@@ -148,7 +148,14 @@ public class BTree {
                         x.treeO[i+1].key = k;
                         x.numTreeObjects = x.numTreeObjects + 1;
                         //System.out.printf("\nThe number of tree objects in the bTreeInsertNonfull is: %d\n", x.numTreeObjects);
-                        diskWrite(x.globalOffset, x);
+                        
+                        if(x.globalOffset == -2){
+                        	root = x;
+                        }
+                        else{
+                        	diskWrite(x.globalOffset, x);
+                        }
+                        
                 }
                 else{
                                 //System.out.printf("\ni's value is: %d\n", i);
@@ -164,9 +171,21 @@ public class BTree {
                         	BTreeNode child = diskRead(x.childPointers[i]);
                         	
                         	if(child.numTreeObjects == (2*t)-1){
+                        		
+                        		
                                 bTreeSplitChild(x, i);
                                 
-                                x = diskRead(x.globalOffset);
+                                //if x is the root, set x to the root
+                                if(x.globalOffset == -2){
+                                	x = root;
+                                }
+                                //if x isn't the root, read in the node
+                                else{
+                                	x = diskRead(x.globalOffset);
+                                }
+                                
+                                
+                                
                                 if(k > x.treeO[i].key){
                                         i++;
                                         child = right;
