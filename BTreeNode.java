@@ -46,7 +46,7 @@ public class BTreeNode {
     	
     	for(int i = 0; i < childPointers.length; i++){
     		//System.out.println(childPointers.length);
-    		//System.out.println(childPointers[i]);
+    		System.out.println(childPointers[i]);
     	}
     }
     
