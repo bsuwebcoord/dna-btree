@@ -2,18 +2,19 @@ import java.io.*;
 
 public class BTree {
         
-        BTreeNode root = null;
-        BTreeNode temp = null;
-        BTreeNode left = null;
-        BTreeNode right = null;
-        BTreeNode fullChildNode = null;
+        static BTreeNode root = null;
+        static BTreeNode temp = null;
+        static BTreeNode left = null;
+        static BTreeNode right = null;
+        static BTreeNode fullChildNode = null;
+        static BTreeNode child = null;
         int numTreeNodes = 1;
         int t;
         int sequenceLength = 0;
+        int numSplits = 0;
         long byteOffsetRoot = 0;
         RandomAccessFile dis;
-        int[] childrenInitializer = null;
-        TreeObject[] treeObjectInitializer = null;
+
         File file = null;
         File dnaFile = null;
         FileWriter fw, yw = null;
@@ -24,6 +25,13 @@ public class BTree {
         public BTree(int degree) throws IOException{
                 
                         t = degree;
+                        
+                        root = new BTreeNode(-2, false, 0, 0, t);
+                        temp = new BTreeNode(-2, false, 0, 0, t);
+                        left = new BTreeNode(-2, false, 0, 0, t);
+                        right = new BTreeNode(-2, false, 0, 0, t);
+                        fullChildNode = new BTreeNode(-2, false, 0, 0, t);
+                        child = new BTreeNode(-2, false, 0, 0, t);
                         
                       //open the dump file
                         try {
@@ -70,7 +78,7 @@ public class BTree {
                 else{
                 	           	
 
-                            temp = diskRead(x.childPointers[i]);
+                            temp.copy(diskRead(x.childPointers[i]));
                             return bTreeSearch(temp, k);
 
 
@@ -80,29 +88,40 @@ public class BTree {
                 }
         }
         
-        public void bTreeSplitChild(BTreeNode x, int i) throws IOException{
+        public void bTreeSplitChild(BTreeNode n, int i) throws IOException{
+        	
+        		
+        	
+        		BTreeNode x = new BTreeNode(-2, false, 0, 0, t);
+        	
+        		x.copy(n);
+        	
                 //BTreeNode y = diskRead(x.childPointers[i]);
+        		
+        		BTreeNode y = new BTreeNode(-2, false, 0, 0, t);
         	
-        	childrenInitializer = new int[2*t];
-            treeObjectInitializer = new TreeObject[(2*t)-1];
-             
-            //initialize the child array and tree object array to a constant size in order to read correctly
-            for(int k = 0; k < treeObjectInitializer.length; k++){
-         	   childrenInitializer[k] = 0;
-         	   treeObjectInitializer[k] = new TreeObject(1,0);
-            }
-            //initialize the last item in the child array that wasn't covered by the for loop above
-            childrenInitializer[childrenInitializer.length-1] = 0;
-        	
-        		BTreeNode y = fullChildNode;
+        		y.copy(fullChildNode);
+        		
                 BTreeNode z = new BTreeNode((int)dis.length(), y.leaf, t-1, y.parentPointer, t);
-                System.out.println("Print first z:");
-                z.printNode();
-                System.out.println("Print first y:");
-                y.printNode();
+                
+                if(numSplits == 0){
+        			System.out.println("Root before split");
+        			root.printNode();
+        			System.out.println("fullChildNode before first split");
+        			fullChildNode.printNode();
+        			System.out.println("y node before first split");
+        			y.printNode();
+        			System.out.println("z node before first split");
+        			z.printNode();
+        		}
+                //System.out.println("Print first z:");
+                //z.printNode();
+                //System.out.println("Print first y:");
+                //y.printNode();
                 numTreeNodes++;
                 for(int j = 0; j <= t-2; j++){
                         z.treeO[j].key = y.treeO[j+t].key;
+                        z.treeO[j].frequency = y.treeO[j+t].frequency;
                 }
                 if(!y.leaf){
                         for(int j = 0; j <= t-1; j++){
@@ -116,48 +135,62 @@ public class BTree {
                 x.childPointers[i+1] = z.globalOffset;
                 for(int j = x.numTreeObjects-1; j >= i; j--){
                         x.treeO[j+1].key = x.treeO[j].key;
+                        x.treeO[j+1].frequency = x.treeO[j].frequency;
                 }
                 //changed y.treeO[t] to y.treeO[t-1]
                 x.treeO[i].key = y.treeO[t-1].key;
+                x.treeO[i].frequency = y.treeO[t-1].frequency;
+                
                 x.numTreeObjects = x.numTreeObjects + 1;
                 //System.out.printf("\nThe number of tree objects is: %d\n", x.numTreeObjects);
                 //write y in same position
                 
-                left = y;
-                right = z;
+                left.copy(y);
+                right.copy(z);
                 
                 
                 
-                System.out.println("Node z:");
-                z.printNode();
+                //System.out.println("Node z:");
+                //z.printNode();
                 //write z at end of file
                 diskWrite(-1, z);
                 
                 
-                System.out.println("Node y:");
-                y.printNode();
+                //System.out.println("Node y:");
+                //y.printNode();
                 
                 diskWrite(y.globalOffset, y);
                 
-                System.out.println("Node x:");
-                x.printNode();
+                //System.out.println("Node x:");
+                //x.printNode();
                 //write x in same position if it's not the root
                 if(x.globalOffset != -2){
                 	diskWrite(x.globalOffset, x);
                 }
                 //if x is the root, update the root
                 else{
-                	root = x;
+                	root.copy(x);
                 }
                 
+                if(numSplits == 0){
+        			System.out.println("Root after split");
+        			root.printNode();
+        			System.out.println("fullChildNode after first split");
+        			fullChildNode.printNode();
+        			System.out.println("y node after first split");
+        			y.printNode();
+        			System.out.println("z node after first split");
+        			z.printNode();
+        		}
                 
+                numSplits++;
         }
         
         public void bTreeInsert(long k) throws IOException{
         	
-                BTreeNode r = root;
-              
-                
+        		BTreeNode r = new BTreeNode(-2, false, 0, 0, t);
+        	
+                r.copy(root);
                 
                 //System.out.printf("\nThe number of tree objects of root is: %d\n", root.numTreeObjects);
                 if(root.numTreeObjects == (2*t)-1){
@@ -165,7 +198,8 @@ public class BTree {
                         root = new BTreeNode(-2, false, 0, 0, t);
                         numTreeNodes++;
                         root.childPointers[0] = (int)dis.length();
-                        fullChildNode = r;
+                        fullChildNode.copy(r);
+                        fullChildNode.globalOffset = (int)dis.length();
                         diskWrite(-1, r);
                         bTreeSplitChild(root, 0);
                         bTreeInsertNonfull(root,k);
@@ -175,11 +209,16 @@ public class BTree {
                 }
         }
         
-        public void bTreeInsertNonfull(BTreeNode x, long k) throws IOException{
+        public void bTreeInsertNonfull(BTreeNode n, long k) throws IOException{
                         //added the subtraction of i by 1 to avoid indexOutOfBounds exception
                         //System.out.printf("\nThe number of tree objects of x is: %d\n", x.numTreeObjects);
-        	x.printNode();
+        	
+        	//x.printNode();
         	//System.out.println("Printing key");
+        	
+        	BTreeNode x = new BTreeNode(-2, false, 0, 0, t);
+        	
+        	x.copy(n);
         	
         	System.out.println(k);
         	
@@ -188,14 +227,16 @@ public class BTree {
                 if(x.leaf){
                         while(i >= 0 && k < x.treeO[i].key){
                                 x.treeO[i+1].key = x.treeO[i].key;
+                                x.treeO[i+1].frequency = x.treeO[i].frequency;
                                 i--;
                         }
                         x.treeO[i+1].key = k;
+                        x.treeO[i+1].frequency = 1;
                         x.numTreeObjects = x.numTreeObjects + 1;
                         //System.out.printf("\nThe number of tree objects in the bTreeInsertNonfull is: %d\n", x.numTreeObjects);
                         
                         if(x.globalOffset == -2){
-                        	root = x;
+                        	root.copy(x);
                         }
                         else{
                         	diskWrite(x.globalOffset, x);
@@ -213,7 +254,7 @@ public class BTree {
                         //System.out.printf("\nThe size of the bin file is: %d\n", dis.length());
                         
                         try{
-                        	BTreeNode child = diskRead(x.childPointers[i]);
+                        	child.copy(diskRead(x.childPointers[i]));
                         	
                         	System.out.println("Child read");
                         	
@@ -221,27 +262,27 @@ public class BTree {
                         		
                         		System.out.println("Child full");
                         		
-                        		fullChildNode = child;
+                        		fullChildNode.copy(child);
                         		
                                 bTreeSplitChild(x, i);
                                 
                                 //if x is the root, set x to the root
                                 if(x.globalOffset == -2){
-                                	x = root;
+                                	x.copy(root);
                                 }
                                 //if x isn't the root, read in the node
                                 else{
-                                	x = diskRead(x.globalOffset);
+                                	x.copy(diskRead(x.globalOffset));
                                 }
                                 
                                 
                                 
                                 if(k > x.treeO[i].key){
                                         i++;
-                                        child = right;
+                                        child.copy(right);
                                 }
                                 else{
-                                	child = left;
+                                	child.copy(left);
                                 }
                                 
                               //read in the updated split child
@@ -389,6 +430,14 @@ public class BTree {
             			fullBinaryString += Long.toBinaryString(n.treeO[i].key);
             			
             			bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(fullBinaryString));
+            			
+            			if(binaryToSequence(fullBinaryString).equals("AG")){
+            				System.out.println("Reached leaf");
+            				n.printNode();
+            				System.out.println("Root");
+            				root.printNode();
+            			}
+            			
                 		bw.newLine();
                 	}
             	}
@@ -406,6 +455,13 @@ public class BTree {
             			
             			bw.write(n.treeO[i].frequency + ":  " + binaryToSequence(fullBinaryString));
                 		bw.newLine();
+                		
+                		if(binaryToSequence(fullBinaryString).equals("AG")){
+                			System.out.println("Not leaf");
+            				n.printNode();
+            				System.out.println("Root");
+            				root.printNode();
+            			}
                 		
                 		//visit right subtree
                 		if(i == n.numTreeObjects-1){
@@ -450,10 +506,10 @@ public class BTree {
         	else if(st.equals("11")){
         		return 'T';
         	}
-        	else if(st.equals("01")){
+        	else if(st.equals("10")){
         		return 'G';
         	}
-        	else if(st.equals("10")){
+        	else if(st.equals("01")){
         		return 'C';
         	}
         	else{
