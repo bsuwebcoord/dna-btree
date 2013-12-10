@@ -55,6 +55,10 @@ public class Parser {
                                         
                                         if(line.matches("^//")){
                                                 in_origin = false;
+                                                //insert an N into the dna string so that sequences that span between two ORIGINs aren't counted
+                                                if(dna.length() != 0){
+                                                	dna += 'N';
+                                                }
                                         }
                                         
                                         
