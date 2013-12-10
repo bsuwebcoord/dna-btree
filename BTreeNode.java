@@ -13,6 +13,7 @@ public class BTreeNode {
         // t <= 127
         
         int globalOffset;
+        int degree;
         boolean leaf;
         int numTreeObjects;
         int parentPointer;
@@ -21,13 +22,23 @@ public class BTreeNode {
     
     
     //Constructor for BTreeNode
-    public BTreeNode(int a, boolean b, int c, int d, int[] e, TreeObject[] f){
+    public BTreeNode(int a, boolean b, int c, int d, int e){
         globalOffset = a;
         leaf = b;
         numTreeObjects = c;
         parentPointer = d;
-        childPointers = e;
-        treeO = f;
+        degree = e;
+        
+        childPointers = new int[2*degree];
+        treeO = new TreeObject[2*degree];
+         
+        //initialize the child array and tree object array to a constant size in order to read correctly
+        for(int i = 0; i < treeO.length; i++){
+     	   childPointers[i] = 0;
+     	   treeO[i] = new TreeObject(1,0);
+        }
+        //initialize the last item in the child array that wasn't covered by the for loop above
+        childPointers[childPointers.length-1] = 0;
     }
     
     
@@ -41,6 +52,8 @@ public class BTreeNode {
     }
     
     public  void printNode(){
+    	
+    	System.out.println(globalOffset);
     	
     	System.out.println("Printing node");
     	
