@@ -21,6 +21,7 @@ public class Parser {
     		seqLength = i;
             fileName = a;
             entireDNASequence = dnaSequence();
+            entireDNASequence += 'N';
             dna2Long(dnaSequence());
             subEnd = i;
     	}
@@ -201,11 +202,11 @@ public class Parser {
                             
                     case 'G':
                     case 'g':
-                            return "01";
+                            return "10";
                             
                     case 'C':
                     case 'c':
-                            return "10";
+                            return "01";
             }
             return "";
     }
