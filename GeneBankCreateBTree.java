@@ -181,7 +181,7 @@ public class GeneBankCreateBTree {
        tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
         
        //the -2 is important to identify the root node
-       tree.root = new BTreeNode(-2, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
+       tree.root = new BTreeNode(-2, true, 0, 0, tree.t);
        
        try{
     	   
@@ -210,6 +210,8 @@ public class GeneBankCreateBTree {
        //tree.dis.writeBoolean(false);
        
        Parser parse = new Parser (seqLength, gbkFileName);
+       
+       //tree.fullDNASequence = parse.entireDNASequence;
        
        tree.sequenceLength = seqLength;
        
@@ -246,7 +248,7 @@ public class GeneBankCreateBTree {
        //else{
     	   while(binarySequence != -1){
     		   
-    		   System.out.printf("The number of tree nodes is: %d\n", tree.numTreeNodes);
+    		   //System.out.printf("The number of tree nodes is: %d\n", tree.numTreeNodes);
         	   
    	   		//System.out.println("Sequence number: " + sequenceNumber);
    	   		sequenceNumber++;
@@ -367,6 +369,8 @@ public class GeneBankCreateBTree {
        }
 
        tree.bw.close();
+       tree.zw.write(parse.entireDNASequence);
+       tree.zw.close();
 		
        /* Diagnosing read/write issues
        //System.out.printf("\nThe size of the bin file before anything is written: %d\n", tree.dis.length());
