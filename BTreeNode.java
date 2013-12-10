@@ -41,6 +41,23 @@ public class BTreeNode {
         childPointers[childPointers.length-1] = 0;
     }
     
+    public void copy(BTreeNode c){
+    	this.globalOffset = c.globalOffset;
+    	this.degree = c.degree;
+    	this.leaf = c.leaf;
+    	this.numTreeObjects = c.numTreeObjects;
+    	this.parentPointer = c.parentPointer;
+    	
+    	for(int i = 0; i < this.childPointers.length; i++){
+    		this.childPointers[i] = c.childPointers[i];
+    	}
+    	
+    	for(int i = 0; i < this.treeO.length; i++){
+    		this.treeO[i].frequency = c.treeO[i].frequency;
+    		this.treeO[i].key = c.treeO[i].key;
+    	}
+    }
+    
     
     public TreeObject getTreeObject(long key){
     	int i=0;
@@ -53,14 +70,29 @@ public class BTreeNode {
     
     public  void printNode(){
     	
-    	System.out.println(globalOffset);
+    	System.out.printf("\nThe global offset is: %d\n", globalOffset);
+    	System.out.printf("The leaf value is: " + leaf + "\n");
+    	System.out.printf("The number of tree objects is: %d\n", numTreeObjects);
+    	System.out.printf("The parent pointer is: %d\n", parentPointer);
+    	System.out.printf("The degree is: %d\n", degree);
     	
-    	System.out.println("Printing node");
+    	System.out.printf("Node pointers: ");
     	
     	for(int i = 0; i < childPointers.length; i++){
     		//System.out.println(childPointers.length);
-    		System.out.println(childPointers[i]);
+    		System.out.printf("%d: %d, ", i, childPointers[i]);
     	}
+    	
+    	System.out.printf("\n");
+    	
+    	System.out.printf("Tree objects: ");
+    	
+    	for(int i = 0; i < numTreeObjects; i++){
+    		//System.out.println(childPointers.length);
+    		System.out.printf("Object #%d - Key: %d - Freq: %d, ", i, treeO[i].key, treeO[i].frequency);
+    	}
+    	
+    	System.out.printf("\n");
     }
     
     public Boolean equals(BTreeNode x){
