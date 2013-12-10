@@ -1,0 +1,26 @@
+David Allen
+Guy Aydelotte
+Dustin Calkins
+
+CS 342 Team Programming Project: Bioinformatics README
+
+
+Our BTree is stored as a binary data file on the disk. The first part of the binary file is the metadata for the BTree.
+The metadata includes the following:
+      4 bytes - number of tree nodes
+      4 bytes - the degree (t) of the BTree
+      8 bytes - the byte offset of the root node.
+
+Following the metadata, the file is a list of all of the nodes, with the following information for each node:
+      8 bytes - global offset value
+      1 byte  - leaf true/false
+      4 bytes - number of tree objects contained in the node
+      4 bytes - parent pointer
+   2t*4 bytes - child pointers
+2t-1*12 bytes - tree objects (31 bits for the frequency, 64 bits for the key value)
+
+Cache Time Improvement
+We found the improvement from using a cache, and from using a larger cache versus a small cache, to be as follows:
+Time running ______ with no cache: 
+Time running ______ with cache size 100: 
+Time running ______ with cache size 500: 

@@ -11,8 +11,9 @@ public class GeneBankCreateBTree {
        int seqLength = 0;
        int debugLevel = 0;
        String gbkFileName = "";
-       Cache dnaCache;
+       Cache dnaCache = null;
        BTree tree =  null;
+       BTreeNode deletedNode = null;
        
        //Error handling and setting values from user input:
        
@@ -30,7 +31,7 @@ public class GeneBankCreateBTree {
            }
            else if(args[0].equals("1")){
                withCache = true;
-               if(args.length < 4){
+               if(args.length < 5){
                        System.out.println();
                    System.out.println("You provided too few arguments.");
                    System.out.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
@@ -167,19 +168,9 @@ public class GeneBankCreateBTree {
        }
        
        tree = new BTree(degree);
-       
-       tree.childrenInitializer = new int[2*tree.t];
-       tree.treeObjectInitializer = new TreeObject[(2*tree.t)-1];
         
-                //initialize the child array and tree object array to a constant size in order to read correctly
-                for(int i = 0; i < tree.treeObjectInitializer.length; i++){
-                        tree.childrenInitializer[i] = 0;
-                        tree.treeObjectInitializer[i] = new TreeObject(0,0);
-                }
-                //initialize the last item in the child array that wasn't covered by the for loop above
-                tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
-        
-                tree.root = new BTreeNode(0, true, 0, 0, tree.childrenInitializer, tree.treeObjectInitializer);
+       //the -2 is important to identify the root node
+       tree.root = new BTreeNode(-2, true, 0, 0, tree.t);
        
        try{
     	   
@@ -205,9 +196,13 @@ public class GeneBankCreateBTree {
        tree.dis.writeLong(tree.byteOffsetRoot);
        
        //write a buffer byte
-       tree.dis.writeBoolean(false);
+       //tree.dis.writeBoolean(false);
        
        Parser parse = new Parser (seqLength, gbkFileName);
+       
+       //tree.fullDNASequence = parse.entireDNASequence;
+       
+       tree.sequenceLength = seqLength;
        
        long binarySequence = parse.nextBinSequence();
        long foundKeyNodeGlobalPosition = 0;
@@ -215,37 +210,152 @@ public class GeneBankCreateBTree {
        //insert or update all subsequences from the gbk file until the end of the file is reached
        
        int sequenceNumber = 0;
-       
-       while(binarySequence != -1){
+       /*
+       if(withCache){
     	   
-    	   		System.out.println("Sequence number: " + sequenceNumber);
-    	   		sequenceNumber++;
-               
-               foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
-               
-               //if the key wasn't found, insert it into the BTree
-               if(foundKeyNodeGlobalPosition == -1){
-                       tree.bTreeInsert(binarySequence);
-               }
-               //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
-               else{
-                       BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
-                       
-                       int i = 0;
-               
-               while(binarySequence != updatedNode.treeO[i].key){
-                       i++;
-               }
-               updatedNode.treeO[i].frequency++;
-               
-               tree.diskWrite(updatedNode.globalOffset, updatedNode);
-               
-               }
-               
-               binarySequence = parse.nextBinSequence();
+    	   BTreeNode deletedCacheNode = null;
+    	   
+    	   while(binarySequence != -1){
+        	   
+    		   System.out.println("Sequence number: " + sequenceNumber);
+   	   	   	   sequenceNumber++;
+              
+   	   	   	   //this will add the 
+   	   	   	   deletedCacheNode = dnaCache.getObject(binarySequence);
+   	   	   	   
+   	   	   	   if(deletedCacheNode != null){
+   	   	   		   for(int i = 0; i < deletedCacheNode.numTreeObjects; i++){
+   	   	   			   foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, deletedCacheNode.treeO[i].key);
+   	   	   			   
+   	   	   		   }
+   	   	   	   }
+              
+   	   	   	   binarySequence = parse.nextBinSequence();
+    	   }
        }
+       */
+       //else{
+       		boolean fourInserted = false;
+       		int countOfAllT = 0;
        
-       tree.byteOffsetRoot = tree.dis.length()-1;
+    	   while(binarySequence != -1){
+    		   
+    		   if(binarySequence == 16383){
+    			   countOfAllT++;
+    		   }
+    		   
+    		   //System.out.printf("The number of tree nodes is: %d\n", tree.numTreeNodes);
+        	   
+   	   		//System.out.println("Sequence number: " + sequenceNumber);
+   	   		sequenceNumber++;
+              
+              foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
+              
+              //if the key wasn't found, insert it into the BTree
+              if(foundKeyNodeGlobalPosition == -1){
+            	  
+            	  if(fourInserted && binarySequence == 4){
+            		  System.out.println("Four was inserted but wasn't found");
+            	  }
+            	  
+            	  //when using cache, first remove all nodes from cache and update the tree with those nodes
+            	  if(withCache){
+            		  
+	            		//remove each item from the cache and write it to the disk
+	   	       		   for(int k = dnaCache.list.size()-1; k > -1; k--){
+	   	       			   System.out.println(k);
+	   	       			   deletedNode = dnaCache.removeObject(k);
+	   	       			   tree.diskWrite(deletedNode.globalOffset, deletedNode);
+	   	       		   }
+            	  }
+	            	
+                   tree.bTreeInsert(binarySequence);
+              }
+              //key was found in the root
+              else if(foundKeyNodeGlobalPosition == -2){
+           	   int i = 0;
+                  
+	               while(binarySequence != tree.root.treeO[i].key){
+	                       i++;
+	               }
+	               
+	               tree.root.treeO[i].frequency++;
+              }
+              //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
+              else{
+           	   //System.out.println("The key was found");
+           	   
+           	   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+           	   
+           	   
+                      
+           	   int i = 0;
+              
+	               while(binarySequence != updatedNode.treeO[i].key){
+	                       i++;
+	               }
+	               
+	               //System.out.printf("\nThe binary sequence being compared: %d\n", binarySequence);
+	               //System.out.printf("\nThe key in the node is: %d\n", updatedNode.treeO[i].key);
+	               
+	               //System.out.printf("\nThe frequency before increment is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               
+	               
+	               //System.out.printf("\nThe frequency after increment is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               //this is where the cache comes in, instead of writing to disk with the updated node, write to cache, then write to disk when node is bumped out, or program finished, write all cache nodes
+	               //each cache write should search for the node, which each have a unique globalOffset value, remove that node from the cache, and always move the written node to the front of the cache
+	               //if an item is deleted from the cache, it should do a diskWrite for that node, similar to the line below
+	               if(withCache){
+	            	   //System.out.println("Got to first withCache");
+	            	   
+	            	   deletedNode = dnaCache.getObject(updatedNode, i);
+	            	   
+	            	   //if a node was bumped out of the cache, write it to the disk
+	            	   if(deletedNode != null){
+	            		   tree.diskWrite(deletedNode.globalOffset, deletedNode);
+	            	   }
+	               }
+	               else{
+	            	   updatedNode.treeO[i].frequency++;
+	            	   tree.diskWrite(updatedNode.globalOffset, updatedNode);
+	               }
+	               
+	               
+	               //updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+	               
+	               //System.out.printf("\nThe frequency after writing to disk is: %d\n", updatedNode.treeO[i].frequency);
+	               
+	               //updatedNode = tree.diskRead(updatedNode.globalOffset);
+	               
+	               //System.out.printf("\nThe frequency after writing to disk using updatednode.globalOffset is: %d\n", updatedNode.treeO[i].frequency);
+              
+              }
+              
+              if(binarySequence == 4){
+            	  fourInserted = true;
+              }
+              
+              binarySequence = parse.nextBinSequence();
+              
+              
+    	   }
+    	   
+    	   
+    	   
+    	   if(withCache){
+    		   //System.out.println("Last cache dump");
+    		   //remove each item from the cache and write it to the disk
+    		   for(int k = dnaCache.list.size()-1; k > -1; k--){
+    			   System.out.println(k);
+    			   deletedNode = dnaCache.removeObject(k);
+    			   tree.diskWrite(deletedNode.globalOffset, deletedNode);
+    		   }
+    	   }
+       //}
+       
+       tree.byteOffsetRoot = tree.dis.length();
        
        //write the root node to disk after building the BTree
        tree.diskWrite(-1, tree.root);
@@ -263,8 +373,13 @@ public class GeneBankCreateBTree {
     	   tree.bw.newLine();
     	   tree.inOrderPrintToDump(tree.diskRead(tree.byteOffsetRoot));
        }
+       
+       System.out.println("Number of all T's");
+       System.out.println(countOfAllT);
 
        tree.bw.close();
+       tree.zw.write(parse.entireDNASequence);
+       tree.zw.close();
 		
        /* Diagnosing read/write issues
        //System.out.printf("\nThe size of the bin file before anything is written: %d\n", tree.dis.length());

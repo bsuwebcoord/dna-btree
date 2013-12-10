@@ -14,12 +14,18 @@ public class Parser {
 
     //Constructor for Parser
     public Parser(int i, String a){
-        seqLength = i;
-        fileName = a;
-        entireDNASequence = dnaSequence();
-        dna2Long(dnaSequence());
-        subEnd = i-1;
-        
+    	if(i < 0){
+    		//do nothing, but you can use the methods in Parse
+    	}
+    	else{
+    		seqLength = i;
+            fileName = a;
+            entireDNASequence = dnaSequence();
+            entireDNASequence += 'N';
+            dna2Long(dnaSequence());
+            subEnd = i;
+    	}
+     
     }
     
     /** Parse gbk file to full dna sequence string
@@ -49,6 +55,10 @@ public class Parser {
                                         
                                         if(line.matches("^//")){
                                                 in_origin = false;
+                                                //insert an N into the dna string so that sequences that span between two ORIGINs aren't counted
+                                                if(dna.length() != 0){
+                                                	dna += 'N';
+                                                }
                                         }
                                         
                                         
@@ -182,9 +192,7 @@ public class Parser {
                     return dnaBinStr;
             
     }
-    
         
-            
     public String dnaBase(char ch){
             
             switch(ch){
@@ -198,11 +206,11 @@ public class Parser {
                             
                     case 'G':
                     case 'g':
-                            return "01";
+                            return "10";
                             
                     case 'C':
                     case 'c':
-                            return "10";
+                            return "01";
             }
             return "";
     }
