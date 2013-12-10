@@ -168,17 +168,6 @@ public class GeneBankCreateBTree {
        }
        
        tree = new BTree(degree);
-       
-       tree.childrenInitializer = new int[2*tree.t];
-       tree.treeObjectInitializer = new TreeObject[(2*tree.t)-1];
-        
-       //initialize the child array and tree object array to a constant size in order to read correctly
-       for(int i = 0; i < tree.treeObjectInitializer.length; i++){
-    	   tree.childrenInitializer[i] = 0;
-    	   tree.treeObjectInitializer[i] = new TreeObject(1,0);
-       }
-       //initialize the last item in the child array that wasn't covered by the for loop above
-       tree.childrenInitializer[tree.childrenInitializer.length-1] = 0;
         
        //the -2 is important to identify the root node
        tree.root = new BTreeNode(-2, true, 0, 0, tree.t);
@@ -246,7 +235,14 @@ public class GeneBankCreateBTree {
        }
        */
        //else{
+       		boolean fourInserted = false;
+       		int countOfAllT = 0;
+       
     	   while(binarySequence != -1){
+    		   
+    		   if(binarySequence == 16383){
+    			   countOfAllT++;
+    		   }
     		   
     		   //System.out.printf("The number of tree nodes is: %d\n", tree.numTreeNodes);
         	   
@@ -257,6 +253,10 @@ public class GeneBankCreateBTree {
               
               //if the key wasn't found, insert it into the BTree
               if(foundKeyNodeGlobalPosition == -1){
+            	  
+            	  if(fourInserted && binarySequence == 4){
+            		  System.out.println("Four was inserted but wasn't found");
+            	  }
             	  
             	  //when using cache, first remove all nodes from cache and update the tree with those nodes
             	  if(withCache){
@@ -333,7 +333,13 @@ public class GeneBankCreateBTree {
               
               }
               
+              if(binarySequence == 4){
+            	  fourInserted = true;
+              }
+              
               binarySequence = parse.nextBinSequence();
+              
+              
     	   }
     	   
     	   
@@ -367,6 +373,9 @@ public class GeneBankCreateBTree {
     	   tree.bw.newLine();
     	   tree.inOrderPrintToDump(tree.diskRead(tree.byteOffsetRoot));
        }
+       
+       System.out.println("Number of all T's");
+       System.out.println(countOfAllT);
 
        tree.bw.close();
        tree.zw.write(parse.entireDNASequence);
