@@ -4,10 +4,13 @@ public class GeneBankSearch {
 
     public static void main(String[] args) throws IOException {
     	
+    	long startTime = System.currentTimeMillis();
+    	
     	String bTreeFileName = "";
     	String queryFileName = "";
     	int degree = 0;
     	int debugLevel = 0;
+    	int frequency = -1;
     	boolean withCache = false;
     	long byteOffsetRoot = 0;
     	Cache dnaCache = null;
@@ -63,7 +66,7 @@ public class GeneBankSearch {
                 
             try{
                 if(Integer.parseInt(args[3]) > 0){
-                        dnaCache = new Cache(Integer.parseInt(args[4]));
+                        dnaCache = new Cache(Integer.parseInt(args[3]));
                 }
                 else{
                     throw new RuntimeException("Error: Invalid fourth argument. Must be of the form <cache size>, where the cache size is greater than 0.");
@@ -156,33 +159,90 @@ public class GeneBankSearch {
         
         BufferedReader br = new BufferedReader(new FileReader(queryFileName));
         String line;
+        
+        String[] arrayGBK = bTreeFileName.split("\\.");
+        
         while ((line = br.readLine()) != null) {
         	
-        	dnaLong = Long.parseLong(parse.seq2Bin(line),2);
+        	if(Integer.parseInt(arrayGBK[4]) != line.length()){
+        		System.out.println();
+                System.out.printf("One of the sequences was not length " + arrayGBK[4]);
+                System.out.println();
+                System.exit(1);
+        	}
+        	
+        	String sequenceString = parse.seq2Bin(line);
+        	
+        	dnaLong = Long.parseLong(sequenceString,2);
+        	
+
         	
         	//search the BTree for the sequence
         	foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, dnaLong);
         	
         	//if not found print 0
         	if(foundKeyNodeGlobalPosition == -1){
-        		System.out.println("0");
+        		System.out.printf("%s: 0\n", line);
         	}
-        	//else print the frequency
-        	else{
-        		BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
-
-         	   	int i = 0;
-            
-         	   	while(dnaLong != updatedNode.treeO[i].key){
+        	//found in root
+        	else if(foundKeyNodeGlobalPosition == -2){
+        		int i = 0;
+                
+         	   	while(dnaLong != tree.root.treeO[i].key){
          	   		i++;
 	            }
+         	   	System.out.printf("%s: %d\n", line, tree.root.treeO[i].frequency);
+        	}
+        	//else found
+        	else{
+        		
+            	if(withCache){
+            		
+            		//search through cache, if it's found the cache will be updated
+            		frequency = dnaCache.searchWithPosition(foundKeyNodeGlobalPosition, dnaLong);
+            			
+            		//wasn't found in cache, add that node to the cache
+            		if(frequency == -1){
+            			
+            			BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+            			
+            			int i = 0;
+                        
+                 	   	while(dnaLong != updatedNode.treeO[i].key){
+                 	   		i++;
+        	            }
+            			
+            			System.out.printf("%s: %d\n", line, updatedNode.treeO[i].frequency);
+            			
+            			dnaCache.addObject(tree.diskRead(foundKeyNodeGlobalPosition));
+            		}
+            		else{
+            			System.out.printf("%s: %d\n", line, frequency);
+            		}
+            		
+            		
+            	}
+            	else{
+        		
+	        		BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+	
+	         	   	int i = 0;
+	            
+	         	   	while(dnaLong != updatedNode.treeO[i].key){
+	         	   		i++;
+		            }
+	         	   	
+	         	   	System.out.printf("%s: %d\n", line, updatedNode.treeO[i].frequency);
          	   	
-         	   	System.out.println(updatedNode.treeO[i].frequency);
+            	}
 	           
         	}
         }
         br.close();
+        dis.close();
         
+        long endTime = System.currentTimeMillis();
+        System.out.println(endTime - startTime);
        
     }
 
