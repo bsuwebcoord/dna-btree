@@ -1,3 +1,10 @@
+/* Authors: David Allen, Guy Aydelotte, Dustin Calkins
+ * Date: 12/10/13
+ * Class: CS 342 Data Structures
+ * Description: This program implements a BTree that can be created or searched using the GeneBankCreateBTree
+ * 				or the GeneBankSearch class files respectively. 
+ */
+
 import java.io.*;
 
 public class GeneBankCreateBTree {
