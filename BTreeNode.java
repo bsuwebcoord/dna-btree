@@ -26,7 +26,11 @@ public class BTreeNode {
         globalOffset = a;
         leaf = b;
         numTreeObjects = c;
+        
+
         parentPointer = d;
+        
+        
         degree = e;
         
         childPointers = new int[2*degree];
