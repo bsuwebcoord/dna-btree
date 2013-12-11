@@ -148,7 +148,8 @@ public class BTree {
                 left.copy(y);
                 right.copy(z);
                 
-                
+                y.parentPointer = x.globalOffset;
+                z.parentPointer = x.globalOffset;
                 
                 //System.out.println("Node z:");
                 //z.printNode();
