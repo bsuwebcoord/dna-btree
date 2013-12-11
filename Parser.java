@@ -72,19 +72,17 @@ public class Parser {
                                         if(in_origin)
                                         {
                                                 dna += line;
-                                                //System.out.println(line);
                                         }
                                                                                 
                         }
                         file.close();
                         
-                        //System.out.println(dna);
                         return dna;
                         
                 } catch (FileNotFoundException e) {
-                        System.out.println();
-            System.out.println("Could not find file. Please make sure the file is in the proper directory and that you entered the filename correctly.");
-            System.out.println();
+                        System.err.println();
+            System.err.println("Could not find file. Please make sure the file is in the proper directory and that you entered the filename correctly.");
+            System.err.println();
             System.exit(1);
                 }
                 return dna;
@@ -111,44 +109,11 @@ public class Parser {
                                 //detect if "n" is in the sequence
                                 if(sequence.contains("n") || sequence.contains("N")){
                                         sequence = null;
-                                        System.out.println("N appeared in the sequence");
                                 }else{
                                         
                                         long dnaLong = Long.parseLong(this.seq2Bin(sequence),2);
                                         TreeObject t = new TreeObject(1, dnaLong); 
-                                        System.out.println(t);
-                                        
-                                        
-                                        /*TESTING TO VIEW BINARY REPRESENTATION
-                                         *****************************
-                                        System.out.println(sequence);
-                                        long dnaBin = this.seq2Bin(sequence);
-                                        
-                                        System.out.println("Long value: "+dnaLong);
-                                        
-                                        //convert from long back to string
-                                        String binString = Long.toBinaryString(dnaLong);
-                                        System.out.println("toBinaryString: "+binString);
-                                        
-                                        //determin if length of string is less than sequence length (*2)
-                                        int length = (seqLength*2) - binString.length();
-                                        System.out.println("Short by: "+length);
-                                        
-                                        //USE THIS SNIPPET FOR READING LONG BACK TO BINARY (PADS MISSING "0"s IN FRONT)
-                                        String newBinString = "";//reset
-                                        if(length > 0){
-                                                char[] padArray = new char[length];
-                                                Arrays.fill(padArray, '0');
-                                                String padString = new String(padArray);
-                                                newBinString = padString + binString; //pad with "0"s if needed
-                                        }
-                                        
-                                        System.out.println("toBinaryString: "+newBinString);
-                                        System.out.println("string:         "+seq2BinStr(sequence));
-                                        System.out.println("");
-                                        */
-                                        
-                                        
+                                             
                                 }
                                 chEndPointer++;
                         }
