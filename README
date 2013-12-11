@@ -1,33 +1,52 @@
+ 
+Team Members:
+
 David Allen
 Guy Aydelotte
 Dustin Calkins
 
 CS 342 Team Programming Project: Bioinformatics README
 
+Layout of BTree on Disk:
 
-Our BTree is stored as a binary data file on the disk. The first part of the binary file is the metadata for the BTree.
-The metadata includes the following:
-      4 bytes - number of tree nodes
-      4 bytes - the degree (t) of the BTree
-      8 bytes - the byte offset of the root node.
+      Our BTree is stored as a binary data file on the disk. The first part of the binary file is the metadata for the BTree.
+      The metadata includes the following:
+	    4 bytes - number of tree nodes
+	    4 bytes - the degree (t) of the BTree
+	    8 bytes - the byte offset of the root node.
 
-Following the metadata, the file is a list of all of the nodes, with the following information for each node:
-      8 bytes - global offset value
-      1 byte  - leaf true/false
-      4 bytes - number of tree objects contained in the node
-      4 bytes - parent pointer
-   2t*4 bytes - child pointers
-2t-1*12 bytes - tree objects (31 bits for the frequency, 64 bits for the key value)
+      Following the metadata, the file is a list of all of the BTree nodes, with the following information for each node:
+	    8 bytes - global offset value
+	    1 byte  - leaf true/false
+	    4 bytes - number of tree objects contained in the node
+	    4 bytes - parent pointer
+	2t*4 bytes - child pointers
+      2t-1*12 bytes - tree objects (31 bits for the frequency, 64 bits for the key value)
+      
+      The root node occupies the last bytes of the binary file, and is written right before the program terminates. 
 
-Cache Time Improvement
-We found the improvement from using a cache, and from using a larger cache versus a small cache, to be as follows:
-CreateBTree Running with Degree 2 and Sequence Length 2 on test1.gbk
-Time running 943 ms with no cache: 
-Time running 540 ms with cache size 100: 
-Time running 534 ms with cache size 500: 
+Cache Time Improvement:
 
-SearchBTree Running with Degree 2 and Sequence Length 7 on test3 and query7
-Time running 3453 ms with no cache.
-Time running 3335 ms with cache size 100.
-Time running 3289 ms with cahce size 500.
+      Using a cache reduced the running time of both creating and searching a BTree by decreasing the number of DiskRead
+      and DiskWrite operations. Instead of having to immediately write an increase in frequency back to disk, a cache could
+      be used to hold these changes. For searching a cache, the most frequently queried keys could be stored in the cache for
+      quick access.
+     
+      We found the improvement from using a cache, and from using a larger cache versus a small cache, to be as follows:
+      
+      GeneBankCreateBTree Running with Degree 2 and Sequence Length 2 on test1.gbk
+      Time running 943 ms with no cache: 
+      Time running 540 ms with cache size 100: 
+      Time running 534 ms with cache size 500: 
 
+      GeneBankSearch Running with Degree 2 and Sequence Length 7 on test3 and query7
+      Time running 3453 ms with no cache.
+      Time running 3335 ms with cache size 100.
+      Time running 3289 ms with cahce size 500.
+      
+General Observations:
+
+      The creation and searching of a BTree was faster with lower degrees than with higher degrees. When the degree was higher it
+      took longer to both do a linear search for the key for each node, as well as split the node and copy information between nodes.
+      
+      
