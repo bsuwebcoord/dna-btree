@@ -4,12 +4,11 @@ public class GeneBankSearch {
 
     public static void main(String[] args) throws IOException {
     	
-    	long startTime = System.currentTimeMillis();
+    	//long startTime = System.currentTimeMillis();
     	
     	String bTreeFileName = "";
     	String queryFileName = "";
     	int degree = 0;
-    	int debugLevel = 0;
     	int frequency = -1;
     	boolean withCache = false;
     	long byteOffsetRoot = 0;
@@ -18,12 +17,11 @@ public class GeneBankSearch {
     	RandomAccessFile dis = null;
     	
     	//Error handling and setting values from user input:
-        
         if(args.length < 3 || args.length > 5){
-            System.out.println();
-            System.out.println("You provided too few or too many arguments.");
-            System.out.println("Arguments have the following form: <0/1(no/with Cache)> <btree file> <query file> [<cache size>] [<debug level>]");
-            System.out.println();
+            System.err.println();
+            System.err.println("You provided too few or too many arguments.");
+            System.err.println("Arguments have the following form: <0/1(no/with Cache)> <btree file> <query file> [<cache size>] [<debug level>]");
+            System.err.println();
             System.exit(1);
         }
      
@@ -34,10 +32,10 @@ public class GeneBankSearch {
             else if(args[0].equals("1")){
                 withCache = true;
                 if(args.length < 4){
-                    System.out.println();
-                    System.out.println("You provided too few arguments.");
-                    System.out.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
-                    System.out.println();
+                    System.err.println();
+                    System.err.println("You provided too few arguments.");
+                    System.err.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
+                    System.err.println();
                     System.exit(1);
                 }
             }
@@ -48,9 +46,9 @@ public class GeneBankSearch {
         }
         catch(RuntimeException e){
         
-            System.out.println();
-            System.out.println("RuntimeException: " + e.getMessage());
-            System.out.println();
+            System.err.println();
+            System.err.println("RuntimeException: " + e.getMessage());
+            System.err.println();
             System.exit(1);
             
         }
@@ -74,9 +72,9 @@ public class GeneBankSearch {
             }
             catch(RuntimeException e){
             
-                System.out.println();
-                System.out.println("RuntimeException: " + e.getMessage());
-                System.out.println();
+                System.err.println();
+                System.err.println("RuntimeException: " + e.getMessage());
+                System.err.println();
                 System.exit(1);
                 
             }
@@ -87,19 +85,16 @@ public class GeneBankSearch {
             		if(args[4].equals("0")){
             			//do nothing since debug level is already set to 0 by default
             		}
-            		else if(args[4].equals("1")){
-            			debugLevel = 1;
-            		}
             		else{
-            			throw new RuntimeException("Error: Invalid fifth argument. Must be of the form <debug level>, where the debug level is 0  or 1.");
+            			throw new RuntimeException("Error: Invalid fifth argument. Must be of the form <debug level>, where the debug level is 0.");
             		}
                         
             	}
             	catch(RuntimeException e){
                     
-            		System.out.println();
-            		System.out.println("RuntimeException: " + e.getMessage());
-            		System.out.println();
+            		System.err.println();
+            		System.err.println("RuntimeException: " + e.getMessage());
+            		System.err.println();
             		System.exit(1);
                         
             	}
@@ -112,19 +107,16 @@ public class GeneBankSearch {
                     if(args[4].equals("0")){
                             //do nothing since debug level is already set to 0 by default
                     }
-                    else if(args[4].equals("1")){
-                            debugLevel = 1;
-                    }
                     else{
-                        throw new RuntimeException("Error: Invalid fourth argument. Must be of the form <debug level>, where the debug level is 0  or 1.");
+                        throw new RuntimeException("Error: Invalid fourth argument. Must be of the form <debug level>, where the debug level is 0.");
                     }
                     
                 }
                 catch(RuntimeException e){
                 
-                    System.out.println();
-                    System.out.println("RuntimeException: " + e.getMessage());
-                    System.out.println();
+                    System.err.println();
+                    System.err.println("RuntimeException: " + e.getMessage());
+                    System.err.println();
                     System.exit(1);
                     
                 }
@@ -135,18 +127,21 @@ public class GeneBankSearch {
         }
         catch(FileNotFoundException e){
                 
-                        System.out.println();
-                        System.out.println("RuntimeException: " + e.getMessage());
-                        System.out.println();
+                        System.err.println();
+                        System.err.println("RuntimeException: " + e.getMessage());
+                        System.err.println();
                         System.exit(1);
                 
         }
         
-        dis.seek(4);
+        dis.seek(0);
+        int numNodes = dis.readInt();
         degree = dis.readInt();
         byteOffsetRoot = dis.readLong();
         
         tree = new BTree(degree);
+        
+        tree.numTreeNodes = numNodes;
         
         Parser parse = new Parser(-1, "");
         
@@ -159,23 +154,23 @@ public class GeneBankSearch {
         
         BufferedReader br = new BufferedReader(new FileReader(queryFileName));
         String line;
-        
         String[] arrayGBK = bTreeFileName.split("\\.");
         
         while ((line = br.readLine()) != null) {
         	
+        	//Error handling for sequences that aren't the proper length for the BTree file
         	if(Integer.parseInt(arrayGBK[4]) != line.length()){
-        		System.out.println();
-                System.out.printf("One of the sequences was not length " + arrayGBK[4]);
-                System.out.println();
+        		System.err.println();
+                System.err.printf("One of the sequences was not length " + arrayGBK[4]);
+                System.err.println();
+                dis.close();
+                br.close();
                 System.exit(1);
         	}
         	
         	String sequenceString = parse.seq2Bin(line);
         	
         	dnaLong = Long.parseLong(sequenceString,2);
-        	
-
         	
         	//search the BTree for the sequence
         	foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, dnaLong);
@@ -237,12 +232,14 @@ public class GeneBankSearch {
             	}
 	           
         	}
+        	
         }
+        
         br.close();
         dis.close();
         
-        long endTime = System.currentTimeMillis();
-        System.out.println(endTime - startTime);
+        //long endTime = System.currentTimeMillis();
+        //System.out.println(endTime - startTime);
        
     }
 
