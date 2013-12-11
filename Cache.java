@@ -37,6 +37,36 @@ public class Cache {
         return addObject(s);
         
     }
+    
+    public int searchWithPosition(long pos, long k){
+    	Boolean foundInList = false;
+        BTreeNode nextNode = null;
+        int freq = -1;
+        
+        Iterator<BTreeNode> x = list.listIterator(0);
+        
+        while(x.hasNext() && !foundInList){
+        	
+        	nextNode = x.next();
+        	
+            if(pos == nextNode.globalOffset){
+                x.remove();
+                hits++;
+                foundInList = true;
+                
+                int i = 0;
+	            while(k != nextNode.treeO[i].key){
+	            	i++;
+	            }
+	            
+	            freq = nextNode.treeO[i].frequency;
+	            
+                addObject(nextNode);
+            }
+        }
+        
+        return freq;
+    }
 
     //adds object to the first position of cache
     public BTreeNode addObject(BTreeNode s){
