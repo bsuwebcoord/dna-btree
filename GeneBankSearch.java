@@ -1,10 +1,15 @@
+/* Authors: David Allen, Guy Aydelotte, Dustin Calkins
+ * Date: 12/10/13
+ * Class: CS 342 Data Structures
+ * Description: This program implements a BTree that can be created or searched using the GeneBankCreateBTree
+ * 				or the GeneBankSearch class files respectively. 
+ */
+
 import java.io.*;
 
 public class GeneBankSearch {
 
     public static void main(String[] args) throws IOException {
-    	
-    	//long startTime = System.currentTimeMillis();
     	
     	String bTreeFileName = "";
     	String queryFileName = "";
@@ -104,7 +109,7 @@ public class GeneBankSearch {
         else if(args.length == 4){
                 try{
                     
-                    if(args[4].equals("0")){
+                    if(args[3].equals("0")){
                             //do nothing since debug level is already set to 0 by default
                     }
                     else{
@@ -237,9 +242,6 @@ public class GeneBankSearch {
         
         br.close();
         dis.close();
-        
-        //long endTime = System.currentTimeMillis();
-        //System.out.println(endTime - startTime);
        
     }
 
