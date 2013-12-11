@@ -21,6 +21,7 @@ Following the metadata, the file is a list of all of the nodes, with the followi
 
 Cache Time Improvement
 We found the improvement from using a cache, and from using a larger cache versus a small cache, to be as follows:
-Time running ______ with no cache: 
-Time running ______ with cache size 100: 
-Time running ______ with cache size 500: 
+Running with Degree 2 and Sequence Length 2 on test1.gbk
+Time running 943 ms with no cache: 
+Time running 540 ms with cache size 100: 
+Time running 534 ms with cache size 500: 
