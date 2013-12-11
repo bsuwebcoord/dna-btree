@@ -1,13 +1,11 @@
 import java.io.*;
-import java.util.*;
 
 public class GeneBankCreateBTree {
 
     public static void main(String[] args) throws IOException {
     
        boolean withCache = false;
-       //this is the default degree (optimal based on our implementation)
-       int degree = 127;
+       int degree = 127; //this is the default degree (optimal based on our implementation)
        int seqLength = 0;
        int debugLevel = 0;
        String gbkFileName = "";
@@ -174,12 +172,8 @@ public class GeneBankCreateBTree {
        
        try{
     	   
-    	   		
-              
     	   tree.dis = new RandomAccessFile(gbkFileName +  ".btree.data." + seqLength + "." + degree, "rw");
-               
-               
-               
+                   
        }
        catch(FileNotFoundException e){
                
@@ -195,12 +189,7 @@ public class GeneBankCreateBTree {
        tree.dis.writeInt(tree.t);
        tree.dis.writeLong(tree.byteOffsetRoot);
        
-       //write a buffer byte
-       //tree.dis.writeBoolean(false);
-       
        Parser parse = new Parser (seqLength, gbkFileName);
-       
-       //tree.fullDNASequence = parse.entireDNASequence;
        
        tree.sequenceLength = seqLength;
        
@@ -209,61 +198,18 @@ public class GeneBankCreateBTree {
        
        //insert or update all subsequences from the gbk file until the end of the file is reached
        
-       int sequenceNumber = 0;
-       /*
-       if(withCache){
-    	   
-    	   BTreeNode deletedCacheNode = null;
-    	   
     	   while(binarySequence != -1){
-        	   
-    		   System.out.println("Sequence number: " + sequenceNumber);
-   	   	   	   sequenceNumber++;
-              
-   	   	   	   //this will add the 
-   	   	   	   deletedCacheNode = dnaCache.getObject(binarySequence);
-   	   	   	   
-   	   	   	   if(deletedCacheNode != null){
-   	   	   		   for(int i = 0; i < deletedCacheNode.numTreeObjects; i++){
-   	   	   			   foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, deletedCacheNode.treeO[i].key);
-   	   	   			   
-   	   	   		   }
-   	   	   	   }
-              
-   	   	   	   binarySequence = parse.nextBinSequence();
-    	   }
-       }
-       */
-       //else{
-       		boolean fourInserted = false;
-       		int countOfAllT = 0;
-       
-    	   while(binarySequence != -1){
-    		   
-    		   if(binarySequence == 16383){
-    			   countOfAllT++;
-    		   }
-    		   
-    		   //System.out.printf("The number of tree nodes is: %d\n", tree.numTreeNodes);
-        	   
-   	   		//System.out.println("Sequence number: " + sequenceNumber);
-   	   		sequenceNumber++;
               
               foundKeyNodeGlobalPosition = tree.bTreeSearch(tree.root, binarySequence);
               
               //if the key wasn't found, insert it into the BTree
               if(foundKeyNodeGlobalPosition == -1){
             	  
-            	  if(fourInserted && binarySequence == 4){
-            		  System.out.println("Four was inserted but wasn't found");
-            	  }
-            	  
-            	  //when using cache, first remove all nodes from cache and update the tree with those nodes
+            	  //when using cache, first remove all nodes from cache and update the tree with those nodes before insertion
             	  if(withCache){
             		  
 	            		//remove each item from the cache and write it to the disk
 	   	       		   for(int k = dnaCache.list.size()-1; k > -1; k--){
-	   	       			   System.out.println(k);
 	   	       			   deletedNode = dnaCache.removeObject(k);
 	   	       			   tree.diskWrite(deletedNode.globalOffset, deletedNode);
 	   	       		   }
@@ -343,7 +289,6 @@ public class GeneBankCreateBTree {
        }
        
        tree.bw.close();
-       tree.zw.close();
        tree.dis.close();
        
     }
