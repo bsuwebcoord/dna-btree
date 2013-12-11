@@ -21,7 +21,13 @@ Following the metadata, the file is a list of all of the nodes, with the followi
 
 Cache Time Improvement
 We found the improvement from using a cache, and from using a larger cache versus a small cache, to be as follows:
-Running with Degree 2 and Sequence Length 2 on test1.gbk
+CreateBTree Running with Degree 2 and Sequence Length 2 on test1.gbk
 Time running 943 ms with no cache: 
 Time running 540 ms with cache size 100: 
 Time running 534 ms with cache size 500: 
+
+SearchBTree Running with Degree 2 and Sequence Length 7 on test3 and query7
+Time running 3453 ms with no cache.
+Time running 3335 ms with cache size 100.
+Time running 3289 ms with cahce size 500.
+
