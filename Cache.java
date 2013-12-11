@@ -38,7 +38,9 @@ public class Cache {
         
     }
     
+    //search the cache with a global offset
     public int searchWithPosition(long pos, long k){
+    	
     	Boolean foundInList = false;
         BTreeNode nextNode = null;
         int freq = -1;
@@ -60,7 +62,6 @@ public class Cache {
 	            }
 	            
 	            freq = nextNode.treeO[i].frequency;
-	            
                 addObject(nextNode);
             }
         }
@@ -68,7 +69,7 @@ public class Cache {
         return freq;
     }
 
-    //adds object to the first position of cache
+    //adds object to the first position of cache, returns deleted object if an object was bumped out of the cache
     public BTreeNode addObject(BTreeNode s){
     	
     	BTreeNode deletedObject = null;
@@ -77,8 +78,6 @@ public class Cache {
             deletedObject = list.remove(cacheSize-1);
         }
         list.add(0, s);
-        
-        //System.out.println(list.size());
         
         return deletedObject;
         
