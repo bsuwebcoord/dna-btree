@@ -18,10 +18,10 @@ public class GeneBankCreateBTree {
        //Error handling and setting values from user input:
        
        if(args.length < 4 || args.length > 6){
-               System.out.println();
-           System.out.println("You provided too few or too many arguments.");
-           System.out.println("Arguments have the following form: <0/1(no/with Cache)> <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]");
-           System.out.println();
+           System.err.println();
+           System.err.println("You provided too few or too many arguments.");
+           System.err.println("Arguments have the following form: <0/1(no/with Cache)> <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]");
+           System.err.println();
            System.exit(1);
        }
     
@@ -32,10 +32,10 @@ public class GeneBankCreateBTree {
            else if(args[0].equals("1")){
                withCache = true;
                if(args.length < 5){
-                       System.out.println();
-                   System.out.println("You provided too few arguments.");
-                   System.out.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
-                   System.out.println();
+                   System.err.println();
+                   System.err.println("You provided too few arguments.");
+                   System.err.println("Since you specified using a cache, you must provide a fourth argument of the following form: <cache size>");
+                   System.err.println();
                    System.exit(1);
                }
            }
@@ -46,9 +46,9 @@ public class GeneBankCreateBTree {
        }
        catch(RuntimeException e){
        
-           System.out.println();
-           System.out.println("RuntimeException: " + e.getMessage());
-           System.out.println();
+           System.err.println();
+           System.err.println("RuntimeException: " + e.getMessage());
+           System.err.println();
            System.exit(1);
            
        }
@@ -68,9 +68,9 @@ public class GeneBankCreateBTree {
        }
        catch(RuntimeException e){
        
-           System.out.println();
-           System.out.println("RuntimeException: " + e.getMessage());
-           System.out.println();
+           System.err.println();
+           System.err.println("RuntimeException: " + e.getMessage());
+           System.err.println();
            System.exit(1);
            
        }
@@ -90,9 +90,9 @@ public class GeneBankCreateBTree {
        }
        catch(RuntimeException e){
        
-           System.out.println();
-           System.out.println("RuntimeException: " + e.getMessage());
-           System.out.println();
+           System.err.println();
+           System.err.println("RuntimeException: " + e.getMessage());
+           System.err.println();
            System.exit(1);
            
        }
@@ -111,9 +111,9 @@ public class GeneBankCreateBTree {
            }
            catch(RuntimeException e){
            
-               System.out.println();
-               System.out.println("RuntimeException: " + e.getMessage());
-               System.out.println();
+               System.err.println();
+               System.err.println("RuntimeException: " + e.getMessage());
+               System.err.println();
                System.exit(1);
                
            }
@@ -134,9 +134,9 @@ public class GeneBankCreateBTree {
                    }
                    catch(RuntimeException e){
                    
-                       System.out.println();
-                       System.out.println("RuntimeException: " + e.getMessage());
-                       System.out.println();
+                       System.err.println();
+                       System.err.println("RuntimeException: " + e.getMessage());
+                       System.err.println();
                        System.exit(1);
                        
                    }
@@ -159,9 +159,9 @@ public class GeneBankCreateBTree {
                }
                catch(RuntimeException e){
                
-                   System.out.println();
-                   System.out.println("RuntimeException: " + e.getMessage());
-                   System.out.println();
+                   System.err.println();
+                   System.err.println("RuntimeException: " + e.getMessage());
+                   System.err.println();
                    System.exit(1);
                    
                }
@@ -170,7 +170,7 @@ public class GeneBankCreateBTree {
        tree = new BTree(degree);
         
        //the -2 is important to identify the root node
-       tree.root = new BTreeNode(-2, true, 0, 0, tree.t);
+       tree.root = new BTreeNode(-2, true, 0, -3, tree.t);
        
        try{
     	   
@@ -183,9 +183,9 @@ public class GeneBankCreateBTree {
        }
        catch(FileNotFoundException e){
                
-                       System.out.println();
-                       System.out.println("RuntimeException: " + e.getMessage());
-                       System.out.println();
+                       System.err.println();
+                       System.err.println("RuntimeException: " + e.getMessage());
+                       System.err.println();
                        System.exit(1);
                
        }
@@ -283,33 +283,19 @@ public class GeneBankCreateBTree {
               }
               //if the key was found, update the node with an increased frequency for that key and write the updated node to disk
               else{
-           	   //System.out.println("The key was found");
            	   
-           	   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
+           	   	   BTreeNode updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
            	   
-           	   
-                      
-           	   int i = 0;
+           	   	   int i = 0;
               
 	               while(binarySequence != updatedNode.treeO[i].key){
 	                       i++;
 	               }
 	               
-	               //System.out.printf("\nThe binary sequence being compared: %d\n", binarySequence);
-	               //System.out.printf("\nThe key in the node is: %d\n", updatedNode.treeO[i].key);
-	               
-	               //System.out.printf("\nThe frequency before increment is: %d\n", updatedNode.treeO[i].frequency);
-	               
-	               
-	               
-	               //System.out.printf("\nThe frequency after increment is: %d\n", updatedNode.treeO[i].frequency);
-	               
 	               //this is where the cache comes in, instead of writing to disk with the updated node, write to cache, then write to disk when node is bumped out, or program finished, write all cache nodes
 	               //each cache write should search for the node, which each have a unique globalOffset value, remove that node from the cache, and always move the written node to the front of the cache
 	               //if an item is deleted from the cache, it should do a diskWrite for that node, similar to the line below
-	               if(withCache){
-	            	   //System.out.println("Got to first withCache");
-	            	   
+	               if(withCache){            	   
 	            	   deletedNode = dnaCache.getObject(updatedNode, i);
 	            	   
 	            	   //if a node was bumped out of the cache, write it to the disk
@@ -321,39 +307,22 @@ public class GeneBankCreateBTree {
 	            	   updatedNode.treeO[i].frequency++;
 	            	   tree.diskWrite(updatedNode.globalOffset, updatedNode);
 	               }
-	               
-	               
-	               //updatedNode = tree.diskRead(foundKeyNodeGlobalPosition);
-	               
-	               //System.out.printf("\nThe frequency after writing to disk is: %d\n", updatedNode.treeO[i].frequency);
-	               
-	               //updatedNode = tree.diskRead(updatedNode.globalOffset);
-	               
-	               //System.out.printf("\nThe frequency after writing to disk using updatednode.globalOffset is: %d\n", updatedNode.treeO[i].frequency);
               
-              }
-              
-              if(binarySequence == 4){
-            	  fourInserted = true;
               }
               
               binarySequence = parse.nextBinSequence();
               
-              
     	   }
     	   
     	   
-    	   
+    	 //remove each item from the cache and write it to the disk
     	   if(withCache){
-    		   //System.out.println("Last cache dump");
-    		   //remove each item from the cache and write it to the disk
     		   for(int k = dnaCache.list.size()-1; k > -1; k--){
-    			   System.out.println(k);
     			   deletedNode = dnaCache.removeObject(k);
     			   tree.diskWrite(deletedNode.globalOffset, deletedNode);
     		   }
     	   }
-       //}
+
        
        tree.byteOffsetRoot = tree.dis.length();
        
@@ -362,46 +331,20 @@ public class GeneBankCreateBTree {
        
        //write the metadata to disk
        tree.dis.seek(0);
-       //need to update the numTreeNodes properly
        tree.dis.writeInt(tree.numTreeNodes);
        tree.dis.writeInt(tree.t);
        tree.dis.writeLong(tree.byteOffsetRoot);
        
+       //write to dump file inorder traversal starting at root
        if(debugLevel == 1){
-    	   //write to dump file inorder traversal starting at root
     	   tree.bw.write("frequency:  sequence");
     	   tree.bw.newLine();
     	   tree.inOrderPrintToDump(tree.diskRead(tree.byteOffsetRoot));
        }
        
-       System.out.println("Number of all T's");
-       System.out.println(countOfAllT);
-
        tree.bw.close();
-       tree.zw.write(parse.entireDNASequence);
        tree.zw.close();
-		
-       /* Diagnosing read/write issues
-       //System.out.printf("\nThe size of the bin file before anything is written: %d\n", tree.dis.length());
-       long firstDiskWriteLocation = tree.dis.length()-1;
-       tree.diskWrite(-1, tree.root);
-       long secondDiskWriteLocation = tree.dis.length()-1;
-       tree.diskWrite(-1, tree.root);
-       //BTreeNode test = tree.diskRead(0);
-       
-       //tree.dis.writeInt(5);
-       //tree.dis.seek(tree.dis.length());
-       //tree.dis.writeInt(2147483647);
-       
-       //System.out.printf("\nThe size of the bin file after int is written: %d\n", tree.dis.length());
-       
-       //tree.dis.seek(0);
-       System.out.println(firstDiskWriteLocation);
-       System.out.println(secondDiskWriteLocation);
-       
-       System.out.println(tree.diskRead(firstDiskWriteLocation).globalOffset);
-       System.out.println(tree.diskRead(secondDiskWriteLocation).globalOffset);
-       */
+       tree.dis.close();
        
     }
 
