@@ -23,14 +23,11 @@ public class BTreeNode {
     
     //Constructor for BTreeNode
     public BTreeNode(int a, boolean b, int c, int d, int e){
+    	
         globalOffset = a;
         leaf = b;
         numTreeObjects = c;
-        
-
         parentPointer = d;
-        
-        
         degree = e;
         
         childPointers = new int[2*degree];
@@ -74,29 +71,26 @@ public class BTreeNode {
     
     public  void printNode(){
     	
-    	System.out.printf("\nThe global offset is: %d\n", globalOffset);
-    	System.out.printf("The leaf value is: " + leaf + "\n");
-    	System.out.printf("The number of tree objects is: %d\n", numTreeObjects);
-    	System.out.printf("The parent pointer is: %d\n", parentPointer);
-    	System.out.printf("The degree is: %d\n", degree);
+    	System.err.printf("\nThe global offset is: %d\n", globalOffset);
+    	System.err.printf("The leaf value is: " + leaf + "\n");
+    	System.err.printf("The number of tree objects is: %d\n", numTreeObjects);
+    	System.err.printf("The parent pointer is: %d\n", parentPointer);
+    	System.err.printf("The degree is: %d\n", degree);
     	
-    	System.out.printf("Node pointers: ");
+    	System.err.printf("Node pointers: ");
     	
     	for(int i = 0; i < childPointers.length; i++){
-    		//System.out.println(childPointers.length);
-    		System.out.printf("%d: %d, ", i, childPointers[i]);
+    		System.err.printf("%d: %d, ", i, childPointers[i]);
     	}
     	
-    	System.out.printf("\n");
-    	
-    	System.out.printf("Tree objects: ");
+    	System.err.printf("\n");
+    	System.err.printf("Tree objects: ");
     	
     	for(int i = 0; i < numTreeObjects; i++){
-    		//System.out.println(childPointers.length);
-    		System.out.printf("Object #%d - Key: %d - Freq: %d, ", i, treeO[i].key, treeO[i].frequency);
+    		System.err.printf("Object #%d - Key: %d - Freq: %d, ", i, treeO[i].key, treeO[i].frequency);
     	}
     	
-    	System.out.printf("\n");
+    	System.err.printf("\n");
     }
     
     public Boolean equals(BTreeNode x){
